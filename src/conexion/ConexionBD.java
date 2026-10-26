@@ -11,7 +11,7 @@ import java.util.Properties;
 public class ConexionBD {
     private final Properties configuracion = new Properties();
 
-    public ConexionBD() {
+    private ConexionBD() {
         configuracion.setProperty("url", "jdbc:mariadb://127.0.0.1:3307/modaexpress");
         configuracion.setProperty("usuario", "moda_dev");
         configuracion.setProperty("clave", "ModaPrueba2026");
@@ -20,6 +20,14 @@ public class ConexionBD {
         } catch (IOException e) {
             throw new IllegalStateException("No se pudo leer la configuración de conexión", e);
         }
+    }
+
+    private static class Contenedor {
+        private static final ConexionBD INSTANCIA = new ConexionBD();
+    }
+
+    public static ConexionBD getInstancia() {
+        return Contenedor.INSTANCIA;
     }
 
     public Connection getConexion() throws SQLException {
@@ -33,7 +41,7 @@ public class ConexionBD {
     }
 
     public static void main(String[] args) {
-        try (Connection conexion = new ConexionBD().getConexion()) {
+        try (Connection conexion = getInstancia().getConexion()) {
             System.out.println("Conexión correcta a " + conexion.getCatalog());
         } catch (SQLException e) {
             System.err.println("Error de conexión: " + e.getMessage());

@@ -10,7 +10,7 @@ if (!"POST".equals(request.getMethod())) {
 String usuario = request.getParameter("usuario");
 String clave = request.getParameter("clave");
 boolean valido = false;
-try (Connection conexion = new ConexionBD().getConexion();
+try (Connection conexion = ConexionBD.getInstancia().getConexion();
      PreparedStatement consulta = conexion.prepareStatement("SELECT usuario FROM usuarios WHERE usuario = ? AND clave = ?")) {
     consulta.setString(1, usuario);
     consulta.setString(2, clave);

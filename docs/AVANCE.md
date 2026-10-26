@@ -19,3 +19,6 @@ Se leyeron todos los archivos fuente, vistas, configuración Ant/NetBeans y arch
 
 
 Etapa 2 verificada: conexión JDBC correcta a modaexpress; pruebas HTTP en Tomcat 9/Java 17 de filtro, clave incorrecta, login admin, sesión y logout. Compilación javac 17 correcta.
+
+## Etapa 3: Singleton
+Constructor privado y contenedor estático seguro para hilos. Configuración única por classloader, Connection nueva por petición. Login actualizado y análisis con fragmentos reales. Compilación Java 17 correcta; main JDBC verificado antes del commit.
