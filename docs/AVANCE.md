@@ -31,3 +31,7 @@ Limitaciones: window.close solo funciona si el navegador permite cerrar esa vent
 ## Etapa 4a: CRUD usuarios sin Repository
 SB Admin 7.0.7 con Bootstrap 5 y licencia MIT local, JSTL 1.2 javax incluido. Layout compartido, dashboard, menú y barra de sesión con colores originales. UsuarioServlet contiene JDBC directo: búsqueda, alta, edición, baja, desbloqueo y clave. Restricciones únicas en BD, validaciones servidor, ADMIN para usuarios, protección CSRF y escape JSTL. Cierre de sesión ahora requiere POST.
 Pruebas: Java 17 compila; Tomcat compila todas las vistas. Pruebas HTTP/BD del CRUD, duplicados, claves, desbloqueo, autoeliminación, XSS, roles, CSRF y logout aprobadas. Los módulos siguientes se implementan en sus etapas, en orden.
+
+## Etapa 4b: Repository usuarios
+Se extraen Repository<T, ID>, UsuarioRepository y UsuarioRepositoryJDBC. La fábrica Repositorios concentra la selección de JDBC. Servlet y login usan la interfaz; las consultas salen del servlet. Filter vuelve a comprobar el estado y rol en cada solicitud para revocar sesiones de cuentas bloqueadas, inactivas o eliminadas. Se agrega análisis breve con fragmentos reales.
+Pruebas: compilación Java 17 y repetición del CRUD completo HTTP/BD correctas después de la refactorización.

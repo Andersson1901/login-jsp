@@ -1,6 +1,6 @@
 <%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="util.Autenticacion,modelo.ResultadoAcceso,modelo.Usuario,java.sql.SQLException"%>
+<%@page import="repositorio.UsuarioRepository,repositorio.Repositorios,modelo.ResultadoAcceso,modelo.Usuario,java.sql.SQLException"%>
 <%
 request.setCharacterEncoding("UTF-8");
 if (!"POST".equals(request.getMethod())) {
@@ -14,7 +14,8 @@ if (nombre == null || nombre.length() > 50 || clave == null || clave.length() > 
     return;
 }
 try {
-    ResultadoAcceso resultado = new Autenticacion().autenticar(nombre.trim(), clave);
+    UsuarioRepository usuarios = Repositorios.usuarios();
+    ResultadoAcceso resultado = usuarios.autenticar(nombre.trim(), clave);
     Usuario usuario = resultado.getUsuario();
     if (usuario != null) {
         session.invalidate();

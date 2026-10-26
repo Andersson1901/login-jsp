@@ -30,6 +30,24 @@ public class SesionFilter implements Filter {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
+        try {
+            repositorio.UsuarioRepository usuarios = repositorio.Repositorios.usuarios();
+            modelo.Usuario actual = usuarios.buscarPorId((Integer) sesion.getAttribute("idUsuario"));
+            if (actual == null || !"ACTIVO".equals(actual.getEstado())) {
+                sesion.invalidate();
+                response.sendRedirect(request.getContextPath() + "/bloqueado.jsp");
+                return;
+            }
+            sesion.setAttribute("rol", actual.getRol());
+            sesion.setAttribute("usuario", actual.getUsuario());
+            sesion.setAttribute("nombreUsuario", actual.getNombres());
+        } catch (java.sql.SQLException e) {
+            request.getServletContext().log("No se pudo comprobar la sesión", e);
+            response.setStatus(503);
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("El sistema no está disponible. Intenta nuevamente en unos momentos.");
+            return;
+        }
         if (sesion.getAttribute("csrf") == null) sesion.setAttribute("csrf", java.util.UUID.randomUUID().toString());
         if ("POST".equals(request.getMethod()) && !sesion.getAttribute("csrf").equals(request.getParameter("csrf"))) {
             response.setStatus(403);
