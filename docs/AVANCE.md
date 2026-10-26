@@ -35,3 +35,8 @@ Pruebas: Java 17 compila; Tomcat compila todas las vistas. Pruebas HTTP/BD del C
 ## Etapa 4b: Repository usuarios
 Se extraen Repository<T, ID>, UsuarioRepository y UsuarioRepositoryJDBC. La fábrica Repositorios concentra la selección de JDBC. Servlet y login usan la interfaz; las consultas salen del servlet. Filter vuelve a comprobar el estado y rol en cada solicitud para revocar sesiones de cuentas bloqueadas, inactivas o eliminadas. Se agrega análisis breve con fragmentos reales.
 Pruebas: compilación Java 17 y repetición del CRUD completo HTTP/BD correctas después de la refactorización.
+
+## Etapa 5
+Tablas clientes, proveedores y productos con 8 registros cada una en script 03. Modelos, interfaces Repository, implementaciones JDBC, servlets y vistas CRUD completas con búsqueda y confirmación de baja. Validación servidor de DNI/RUC, correo, importes y stock no negativos; restricciones de BD. Los servicios fuerzan stock y stock mínimo a cero. BigDecimal para importes (2 decimales) y existencias (3 decimales), para admitir insumos por metro.
+Dashboard obtiene sus contadores a través de ResumenRepository. Documentación de patrones en analisis_repository_tablas.md.
+Pruebas: 27 clases compilan en Java 17; HTTP/BD de los tres catálogos, duplicados, edición, búsquedas, documentos inválidos, negativos, servicios y bajas aprobadas.

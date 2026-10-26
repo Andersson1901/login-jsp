@@ -37,6 +37,16 @@ public final class Web {
             throw new IllegalArgumentException("La clave debe tener de 4 a 128 caracteres.");
         return valor;
     }
+    public static java.math.BigDecimal decimal(HttpServletRequest request, String campo, int escala) {
+        try {
+            java.math.BigDecimal valor = new java.math.BigDecimal(requerido(request,campo,20));
+            valor = valor.setScale(escala, java.math.RoundingMode.UNNECESSARY);
+            if (valor.signum() < 0 || valor.compareTo(new java.math.BigDecimal("99999999")) > 0) throw new NumberFormatException();
+            return valor;
+        } catch (NumberFormatException | ArithmeticException e) {
+            throw new IllegalArgumentException("El campo " + campo + " requiere un número no negativo de hasta " + escala + " decimales.");
+        }
+    }
     public static void mensaje(HttpServletRequest request, String mensaje) {
         request.getSession().setAttribute("mensaje", mensaje);
     }
