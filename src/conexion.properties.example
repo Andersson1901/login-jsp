@@ -1,0 +1,5 @@
+# Autor: Rodriguez Alvarado Andersson Eduardo
+# Credenciales ficticias, solo desarrollo local. Copiar como conexion.properties.
+url=jdbc:mariadb://127.0.0.1:3307/modaexpress
+usuario=moda_dev
+clave=ModaPrueba2026
