@@ -1,10 +1,6 @@
-<%-- 
-    Document   : logout
-    Created on : 29 set. 2026, 23:15:15
-    Author     : ander
---%>
-
+<%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
-session.invalidate();
+if ("POST".equals(request.getMethod())) session.invalidate();
 response.sendRedirect("login.jsp");
 %>

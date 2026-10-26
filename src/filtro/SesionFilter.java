@@ -30,6 +30,19 @@ public class SesionFilter implements Filter {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
+        if (sesion.getAttribute("csrf") == null) sesion.setAttribute("csrf", java.util.UUID.randomUUID().toString());
+        if ("POST".equals(request.getMethod()) && !sesion.getAttribute("csrf").equals(request.getParameter("csrf"))) {
+            response.setStatus(403);
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("La solicitud venció. Recarga la página e intenta nuevamente.");
+            return;
+        }
+        if (ruta.equals("/usuarios") && !"ADMIN".equals(sesion.getAttribute("rol"))) {
+            response.setStatus(403);
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("No tienes permiso para administrar usuarios.");
+            return;
+        }
         cadena.doFilter(request, response);
     }
 }

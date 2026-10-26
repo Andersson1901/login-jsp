@@ -1,20 +1,6 @@
-<%-- 
-    Document   : bienvenido
-    Created on : 29 set. 2026, 23:15:05
-    Author     : ander
---%>
-
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="util.Html"%>
-<% String usuario = (String) session.getAttribute("usuario"); %>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Bienvenido</title>
-</head>
-<body>
-    <h2>Bienvenido, <%= Html.escapar(usuario) %></h2>
-    <a href="logout.jsp">Cerrar sesión</a>
-</body>
-</html>
+<%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
+<%@include file="WEB-INF/vistas/cabecera.jspf"%>
+<div class="d-flex justify-content-between align-items-center mb-4"><div><p class="text-muted mb-1">Panel principal</p><h1>Hola, <c:out value="${sessionScope.nombreUsuario}"/></h1><p>Organiza tu tienda desde un solo lugar.</p></div><span class="badge text-bg-light">ModaExpress Perú</span></div>
+<jsp:include page="/resumen"/>
+<div class="card mt-4"><div class="card-body p-4"><h2 class="h5">Del pedido a la entrega</h2><p class="mb-0">SOLPED → Venta → Factura o boleta → Guía de remisión</p></div></div>
+<%@include file="WEB-INF/vistas/pie.jspf"%>
