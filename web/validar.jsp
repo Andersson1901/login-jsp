@@ -1,33 +1,46 @@
 <%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="conexion.ConexionBD,java.sql.*"%>
+<%@page import="util.Autenticacion,modelo.ResultadoAcceso,modelo.Usuario,java.sql.SQLException"%>
 <%
 request.setCharacterEncoding("UTF-8");
 if (!"POST".equals(request.getMethod())) {
     response.sendRedirect("login.jsp");
     return;
 }
-String usuario = request.getParameter("usuario");
+String nombre = request.getParameter("usuario");
 String clave = request.getParameter("clave");
-boolean valido = false;
-try (Connection conexion = ConexionBD.getInstancia().getConexion();
-     PreparedStatement consulta = conexion.prepareStatement("SELECT usuario FROM usuarios WHERE usuario = ? AND clave = ?")) {
-    consulta.setString(1, usuario);
-    consulta.setString(2, clave);
-    try (ResultSet resultado = consulta.executeQuery()) {
-        if (resultado.next()) {
-            usuario = resultado.getString("usuario");
-            valido = true;
+if (nombre == null || nombre.length() > 50 || clave == null || clave.length() > 128) {
+    response.sendRedirect("login.jsp?error=1");
+    return;
+}
+try {
+    ResultadoAcceso resultado = new Autenticacion().autenticar(nombre.trim(), clave);
+    Usuario usuario = resultado.getUsuario();
+    if (usuario != null) {
+        session.invalidate();
+        javax.servlet.http.HttpSession nueva = request.getSession(true);
+        nueva.setAttribute("usuario", usuario.getUsuario());
+        nueva.setAttribute("idUsuario", usuario.getIdUsuario());
+        nueva.setAttribute("nombreUsuario", usuario.getNombres());
+        nueva.setAttribute("rol", usuario.getRol());
+        nueva.setMaxInactiveInterval(1800);
+        response.sendRedirect("bienvenido.jsp");
+    } else {
+        int intentos;
+        synchronized (session) {
+            Integer anteriores = (Integer) session.getAttribute("intentosAcceso");
+            intentos = anteriores == null ? 1 : anteriores + 1;
+            session.setAttribute("intentosAcceso", intentos);
+        }
+        if (resultado.isBloqueado() || intentos >= 3) {
+            session.invalidate();
+            response.sendRedirect("bloqueado.jsp");
+        } else {
+            response.sendRedirect("login.jsp?error=1");
         }
     }
-} catch (SQLException e) {
+} catch (SQLException | RuntimeException e) {
     application.log("No se pudo validar el acceso", e);
-}
-if (valido) {
-    request.changeSessionId();
-    session.setAttribute("usuario", usuario);
-    response.sendRedirect("bienvenido.jsp");
-} else {
     response.sendRedirect("login.jsp?error=1");
 }
 %>

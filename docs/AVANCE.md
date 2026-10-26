@@ -22,3 +22,8 @@ Etapa 2 verificada: conexión JDBC correcta a modaexpress; pruebas HTTP en Tomca
 
 ## Etapa 3: Singleton
 Constructor privado y contenedor estático seguro para hilos. Configuración única por classloader, Connection nueva por petición. Login actualizado y análisis con fragmentos reales. Compilación Java 17 correcta; main JDBC verificado antes del commit.
+
+## Etapa 3: validaciones
+Migración 02 conserva el ID y usuario admin y añade vendedor1 con hash PBKDF2 (120000 iteraciones, sal de 16 bytes). Login transaccional con bloqueo de fila: 3 fallos, reinicio del contador al acertar, rechazo de cuentas bloqueadas/inactivas. Contador adicional en sesión para nombres inexistentes. Sesión nueva al acceder, invalidación al bloquear.
+Verificación: javac 17; HTTP y BD para acierto/error, contador, bloqueo, inactivo, desconocido e intento de inyección SQL; pruebas de hash, sal, Singleton y conexiones distintas correctas.
+Limitaciones: window.close solo funciona si el navegador permite cerrar esa ventana; se muestra «Ya puedes cerrar esta pestaña». El contador de desconocidos es por sesión y puede reiniciarse al borrar cookies; no equivale a una defensa distribuida. Datos migrados fuera de admin quedan inactivos hasta revisión.
