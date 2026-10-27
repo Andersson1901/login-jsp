@@ -1,4 +1,6 @@
 -- Autor: Rodriguez Alvarado Andersson Eduardo
+SET NAMES utf8mb4;
+SET time_zone = '-05:00';
 -- Migración de etapa 2 a 3. Ejecutar una sola vez, en orden.
 USE modaexpress;
 ALTER TABLE usuarios CHANGE id id_usuario INT NOT NULL AUTO_INCREMENT,

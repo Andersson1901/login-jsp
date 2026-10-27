@@ -1,4 +1,5 @@
 <%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
+<%@page pageEncoding="UTF-8"%>
 <%@include file="WEB-INF/vistas/cabecera.jspf"%>
 <div class="d-flex justify-content-between align-items-center mb-4"><div><p class="text-muted mb-1">Panel principal</p><h1>Hola, <c:out value="${sessionScope.nombreUsuario}"/></h1><p>Organiza tu tienda desde un solo lugar.</p></div><span class="badge text-bg-light">ModaExpress Perú</span></div>
 <jsp:include page="/resumen"/>

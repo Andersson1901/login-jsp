@@ -1,0 +1,3 @@
+<%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isErrorPage="true" session="false"%>
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ModaExpress Perú</title><style>body{font:18px sans-serif;background:#0d1f4d;color:white;display:grid;place-content:center;min-height:90vh}a{color:#e0b83c}</style></head><body><main><h1>ModaExpress Perú</h1><p>No se pudo completar la solicitud.</p><p>Vuelve al inicio e intenta nuevamente.</p><a href="${pageContext.request.contextPath}/bienvenido.jsp">Volver al inicio</a></main></body></html>

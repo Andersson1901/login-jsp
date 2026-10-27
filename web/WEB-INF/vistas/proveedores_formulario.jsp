@@ -1,4 +1,5 @@
 <%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
+<%@page pageEncoding="UTF-8"%>
 <%@include file="cabecera.jspf"%><h1 class="mb-4">Proveedor</h1><div class="card"><div class="card-body p-4"><form method="post" action="proveedores"><input type="hidden" name="csrf" value="<c:out value='${sessionScope.csrf}'/>"><input type="hidden" name="accion" value="guardar"><input type="hidden" name="id" value="${registro.idProveedor == 0 ? '' : registro.idProveedor}"><div class="row g-3">
 <div class="col-md-6"><label class="form-label" for="ruc">RUC</label><input class="form-control" type="text" id="ruc" name="ruc" maxlength="11" required value="<c:out value='${registro.ruc}'/>"></div>
 <div class="col-md-6"><label class="form-label" for="razonSocial">Razón social</label><input class="form-control" type="text" id="razonSocial" name="razonSocial" maxlength="150" required value="<c:out value='${registro.razonSocial}'/>"></div>

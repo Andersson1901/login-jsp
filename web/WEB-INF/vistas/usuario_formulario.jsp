@@ -1,4 +1,5 @@
 <%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
+<%@page pageEncoding="UTF-8"%>
 <%@include file="cabecera.jspf"%><h1 class="mb-4">Usuario</h1><div class="card"><div class="card-body p-4"><form method="post" action="usuarios"><input type="hidden" name="csrf" value="<c:out value='${sessionScope.csrf}'/>"><input type="hidden" name="accion" value="guardar"><input type="hidden" name="id" value="${registro.idUsuario == 0 ? '' : registro.idUsuario}"><div class="row g-3"><div class="col-md-6"><label class="form-label" for="nombres">Nombres</label><input class="form-control" id="nombres" name="nombres" type="text" maxlength="100" required value="<c:out value='${registro.nombres}'/>"></div>
 <div class="col-md-6"><label class="form-label" for="apellidos">Apellidos</label><input class="form-control" id="apellidos" name="apellidos" type="text" maxlength="100" required value="<c:out value='${registro.apellidos}'/>"></div>
 <div class="col-md-6"><label class="form-label" for="dni">DNI</label><input class="form-control" id="dni" name="dni" type="text" maxlength="8" required value="<c:out value='${registro.dni}'/>"></div>

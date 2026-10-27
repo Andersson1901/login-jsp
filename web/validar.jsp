@@ -1,5 +1,5 @@
 <%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@page import="repositorio.UsuarioRepository,repositorio.Repositorios,modelo.ResultadoAcceso,modelo.Usuario,java.sql.SQLException"%>
 <%
 request.setCharacterEncoding("UTF-8");

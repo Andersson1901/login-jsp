@@ -1,0 +1,3 @@
+<%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
+<%@page pageEncoding="UTF-8"%>
+<nav class="nav nav-pills gap-2 mb-4" aria-label="Proceso de ventas"><a class="btn btn-outline-primary" href="solped">1. SOLPED</a><a class="btn btn-outline-primary" href="ventas">2. Ventas</a><a class="btn btn-outline-primary" href="comprobantes">3. Comprobantes</a><a class="btn btn-outline-primary" href="guias">4. Guías</a></nav>

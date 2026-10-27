@@ -1,5 +1,5 @@
 <%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
-<%@page contentType="text/html" pageEncoding="UTF-8" session="false"%>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%>
 <%
 javax.servlet.http.HttpSession anterior = request.getSession(false);
 if (anterior != null) anterior.invalidate();

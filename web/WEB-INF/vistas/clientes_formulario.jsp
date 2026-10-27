@@ -1,4 +1,5 @@
 <%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
+<%@page pageEncoding="UTF-8"%>
 <%@include file="cabecera.jspf"%><h1 class="mb-4">Cliente</h1><div class="card"><div class="card-body p-4"><form method="post" action="clientes"><input type="hidden" name="csrf" value="<c:out value='${sessionScope.csrf}'/>"><input type="hidden" name="accion" value="guardar"><input type="hidden" name="id" value="${registro.idCliente == 0 ? '' : registro.idCliente}"><div class="row g-3">
 <div class="col-md-6"><label class="form-label" for="tipoDocumento">Tipo de documento</label><select class="form-select" name="tipoDocumento" id="tipoDocumento"><option value="DNI" ${registro.tipoDocumento == 'DNI' ? 'selected' : ''}>DNI</option><option value="RUC" ${registro.tipoDocumento == 'RUC' ? 'selected' : ''}>RUC</option></select></div>
 <div class="col-md-6"><label class="form-label" for="nroDocumento">Número de documento</label><input class="form-control" type="text" id="nroDocumento" name="nroDocumento" maxlength="11" required value="<c:out value='${registro.nroDocumento}'/>"></div>

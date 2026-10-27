@@ -56,9 +56,9 @@ public class ProductoRepositoryJDBC implements ProductoRepository {
         }
     }
     @Override public void actualizar(Producto entidad) throws SQLException {
-        try(Connection c=ConexionBD.getInstancia().getConexion(); PreparedStatement p=c.prepareStatement("UPDATE productos SET codigo=?,nombre=?,descripcion=?,tipo=?,categoria=?,unidad_medida=?,precio_compra=?,precio_venta=?,stock=?,stock_minimo=?,estado=? WHERE id_producto=?")) {
-            parametros(p,entidad); p.setInt(12,entidad.getIdProducto());
-            if(p.executeUpdate()==0) throw new IllegalArgumentException("El registro ya no existe.");
+        try(Connection c=ConexionBD.getInstancia().getConexion(); PreparedStatement p=c.prepareStatement("UPDATE productos SET codigo=?,nombre=?,descripcion=?,tipo=?,categoria=?,unidad_medida=?,precio_compra=?,precio_venta=?,stock=?,stock_minimo=?,estado=? WHERE id_producto=? AND (tipo=? OR NOT EXISTS(SELECT 1 FROM solped_detalle WHERE id_producto=productos.id_producto))")) {
+            parametros(p,entidad); p.setInt(12,entidad.getIdProducto()); p.setString(13,entidad.getTipo());
+            if(p.executeUpdate()==0) throw new IllegalArgumentException("El registro ya no existe o su tipo está vinculado a pedidos. Crea otro producto para cambiar de tipo.");
         }
     }
     @Override public void eliminar(Integer id) throws SQLException {

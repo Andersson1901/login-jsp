@@ -1,4 +1,6 @@
 -- Autor: Rodriguez Alvarado Andersson Eduardo
+SET NAMES utf8mb4;
+SET time_zone = '-05:00';
 USE modaexpress;
 CREATE TABLE clientes (
  id_cliente INT AUTO_INCREMENT PRIMARY KEY,
@@ -7,13 +9,13 @@ CREATE TABLE clientes (
  telefono VARCHAR(20) NOT NULL, correo VARCHAR(150) NOT NULL,
  estado ENUM('ACTIVO','INACTIVO') NOT NULL DEFAULT 'ACTIVO',
  CHECK ((tipo_documento='DNI' AND nro_documento REGEXP '^[0-9]{8}$') OR (tipo_documento='RUC' AND nro_documento REGEXP '^[0-9]{11}$'))
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE TABLE proveedores (
  id_proveedor INT AUTO_INCREMENT PRIMARY KEY, ruc CHAR(11) NOT NULL UNIQUE,
  razon_social VARCHAR(150) NOT NULL, contacto VARCHAR(100) NOT NULL,
  telefono VARCHAR(20) NOT NULL, correo VARCHAR(150) NOT NULL, direccion VARCHAR(200) NOT NULL,
  estado ENUM('ACTIVO','INACTIVO') NOT NULL DEFAULT 'ACTIVO', CHECK(ruc REGEXP '^[0-9]{11}$')
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE TABLE productos (
  id_producto INT AUTO_INCREMENT PRIMARY KEY, codigo VARCHAR(30) NOT NULL UNIQUE,
  nombre VARCHAR(150) NOT NULL, descripcion VARCHAR(500) NOT NULL,
@@ -24,7 +26,7 @@ CREATE TABLE productos (
  estado ENUM('ACTIVO','INACTIVO') NOT NULL DEFAULT 'ACTIVO',
  CHECK(precio_compra >= 0 AND precio_venta >= 0 AND stock >= 0 AND stock_minimo >= 0),
  CHECK(tipo <> 'SERVICIO' OR (stock=0 AND stock_minimo=0))
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 INSERT INTO clientes(tipo_documento,nro_documento,nombres_razon_social,direccion,telefono,correo) VALUES('DNI','10000001','Ana Torres','Av. Primavera 100, Lima','900100001','cliente1@ejemplo.test');
 INSERT INTO clientes(tipo_documento,nro_documento,nombres_razon_social,direccion,telefono,correo) VALUES('DNI','10000002','Luis Rojas','Av. Primavera 200, Lima','900100002','cliente2@ejemplo.test');
 INSERT INTO clientes(tipo_documento,nro_documento,nombres_razon_social,direccion,telefono,correo) VALUES('DNI','10000003','María Quispe','Av. Primavera 300, Lima','900100003','cliente3@ejemplo.test');

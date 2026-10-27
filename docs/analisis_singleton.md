@@ -38,17 +38,23 @@ Explicación: La inicialización de clases de Java publica la instancia de forma
 
 Bloque 3:
 ```java
-    public Connection getConexion() throws SQLException {
+public Connection getConexion() throws SQLException {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             throw new SQLException("Falta el driver JDBC de MariaDB", e);
         }
-        return DriverManager.getConnection(configuracion.getProperty("url"),
+        Connection conexion = DriverManager.getConnection(configuracion.getProperty("url"),
                 configuracion.getProperty("usuario"), configuracion.getProperty("clave"));
+        try (java.sql.PreparedStatement consulta = conexion.prepareStatement("SET time_zone = ?")) {
+            consulta.setString(1, "-05:00");
+            consulta.execute();
+            return conexion;
+        } catch (SQLException e) {
+            conexion.close();
+            throw e;
+        }
     }
-
-
 ```
 Explicación: Cada llamada obtiene una conexión nueva. Quien la solicita la cierra con try-with-resources.
 

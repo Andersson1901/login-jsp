@@ -1,4 +1,5 @@
 <%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
+<%@page pageEncoding="UTF-8"%>
 <%@include file="cabecera.jspf"%>
 <div class="d-flex justify-content-between align-items-center mb-3"><h1>Usuarios</h1><a class="btn btn-dorado" href="usuarios?accion=nuevo">Nuevo usuario</a></div>
 <form method="get" action="usuarios" class="d-flex gap-2 mb-3"><input class="form-control" name="q" maxlength="100" aria-label="Buscar usuarios" placeholder="Usuario, nombre o DNI" value="<c:out value='${q}'/>"><button class="btn btn-primary">Buscar</button></form>

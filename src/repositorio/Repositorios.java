@@ -9,4 +9,8 @@ public final class Repositorios {
     public static ProveedorRepository proveedores() { return new ProveedorRepositoryJDBC(); }
     public static ProductoRepository productos() { return new ProductoRepositoryJDBC(); }
     public static ResumenRepository resumen() { return new ResumenRepositoryJDBC(); }
+    public static SolpedRepository solped() { return new SolpedRepositoryJDBC(); }
+    public static VentaRepository ventas() { return new VentaRepositoryJDBC(); }
+    public static ComprobanteRepository comprobantes() { return new ComprobanteRepositoryJDBC(); }
+    public static GuiaRepository guias() { return new GuiaRepositoryJDBC(); }
 }

@@ -1,3 +1,4 @@
 <%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
+<%@page pageEncoding="UTF-8"%>
 </div></main><footer class="px-4 py-3 pie">ModaExpress Perú · Sistema académico de gestión de ropa</footer></div></div>
 <script src="${pageContext.request.contextPath}/assets/app.js"></script></body></html>

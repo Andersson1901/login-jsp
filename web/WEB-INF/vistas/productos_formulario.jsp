@@ -1,4 +1,5 @@
 <%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
+<%@page pageEncoding="UTF-8"%>
 <%@include file="cabecera.jspf"%><h1 class="mb-4">Producto</h1><div class="card"><div class="card-body p-4"><form method="post" action="productos"><input type="hidden" name="csrf" value="<c:out value='${sessionScope.csrf}'/>"><input type="hidden" name="accion" value="guardar"><input type="hidden" name="id" value="${registro.idProducto == 0 ? '' : registro.idProducto}"><div class="row g-3">
 <div class="col-md-6"><label class="form-label" for="codigo">Código</label><input class="form-control" type="text" id="codigo" name="codigo" maxlength="30" required value="<c:out value='${registro.codigo}'/>"></div>
 <div class="col-md-6"><label class="form-label" for="nombre">Nombre</label><input class="form-control" type="text" id="nombre" name="nombre" maxlength="150" required value="<c:out value='${registro.nombre}'/>"></div>

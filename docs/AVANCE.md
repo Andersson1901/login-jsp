@@ -11,7 +11,7 @@ Se leyeron todos los archivos fuente, vistas, configuración Ant/NetBeans y arch
 - MariaDB y Connector/J 3.5.10 ya instalados. No se instalan paquetes ni se usa sudo.
 - Se trabaja con commits locales; no se publica ni se cambia Dockerfile.
 
-## Etapa 2 (en verificación)
+## Etapa 2
 - Conexión JDBC configurable y main; login con PreparedStatement y recursos cerrados. Filter central y escape HTML.
 - Script 01 crea la base, tabla, admin y cuenta limitada de desarrollo. JAR JDBC local incluido.
 - La instancia del servicio existente exige autenticación administrativa. Se prepara instancia aislada en 3307, dentro de .local (ignorada por Git), con herramientas/bd_local.py. No altera el servicio existente.
@@ -40,3 +40,29 @@ Pruebas: compilación Java 17 y repetición del CRUD completo HTTP/BD correctas 
 Tablas clientes, proveedores y productos con 8 registros cada una en script 03. Modelos, interfaces Repository, implementaciones JDBC, servlets y vistas CRUD completas con búsqueda y confirmación de baja. Validación servidor de DNI/RUC, correo, importes y stock no negativos; restricciones de BD. Los servicios fuerzan stock y stock mínimo a cero. BigDecimal para importes (2 decimales) y existencias (3 decimales), para admitir insumos por metro.
 Dashboard obtiene sus contadores a través de ResumenRepository. Documentación de patrones en analisis_repository_tablas.md.
 Pruebas: 27 clases compilan en Java 17; HTTP/BD de los tres catálogos, duplicados, edición, búsquedas, documentos inválidos, negativos, servicios y bajas aprobadas.
+
+## Preferencia confirmada durante la etapa 6 (registro histórico)
+El usuario eligió el servicio MariaDB existente en 3306 y posteriormente confirmó que preparó la cuenta de desarrollo. Se cambia la URL por defecto y el ejemplo a 3306. Las verificaciones previas de etapas 2–5 se hicieron en 3307 mientras se esperaba la respuesta; se detuvo esa instancia. La limpieza final posterior retiró sus archivos y el helper del proyecto, como se registra abajo. Script 00 separa la creación administrativa de la cuenta; los scripts 01–04 se ejecutan con permisos de migración sobre modaexpress. Se preservan los cambios que el usuario haga al archivo privado de conexión.
+
+## Revisión de los cambios parciales de Antigravity (27/10/2026)
+Se revisaron git log, status, show --stat HEAD, reflog y diff. En esta copia no existe un commit WIP: HEAD era 7b6f0b9 (Etapa 5), con 11 archivos modificados/no seguidos y la configuración privada aparte. Se hizo respaldo externo antes de integrar.
+Se conservan characterEncoding=UTF-8 y contentType con charset. Los modelos parciales Solped/SolpedDetalle se sustituyen por Solped/Detalle compartido con ventas, evitando dos contratos incompatibles; el script de ventas se completa con datos de ejemplo y numeradores coherentes.
+Cada JSP e include declara pageEncoding UTF-8; todas las páginas HTML reciben meta charset UTF-8 desde la cabecera compartida o su propio head. Los fragmentos de cuerpo y JSP de redirección no generan etiquetas meta duplicadas fuera de head. Filter fija request/response UTF-8; web.xml refuerza la codificación.
+La base y sus 11 tablas ya son utf8mb4_unicode_ci. Se comprobaron textos y bytes de María, algodón, clásico y personalización: están bien almacenados, por lo que no se recargan ni sobrescriben datos válidos. Los scripts declaran utf8mb4 explícitamente y las instrucciones usan --default-character-set=utf8mb4.
+Se confirma 3307 sin escucha, ausencia de .local en el proyecto y configuración privada ignorada por Git con URL 3306. Se elimina el helper de instancia aislada que ya no se utiliza.
+
+## Etapa 6
+Implementados modelos Detalle/Solped/Venta/Comprobante/GuiaRemision, sus interfaces y repositorios JDBC, VentaServlet y vistas con el mismo dashboard. Ítems dinámicos con JavaScript sencillo y precios resueltos en servidor. Correlativos con bloqueo, una venta por SOLPED, un comprobante y una guía por venta.
+Transacción única para cabecera, detalle, descuentos y estados; rollback ante error. IGV 18% con BigDecimal, servicios sin stock, factura con RUC. Edición de venta antes de emitir documentos, anulación con devolución única de stock y bajas con dependencias controladas. Tipos de producto usados en pedidos no se cambian.
+Supuestos de CRUD: pedidos se editan pendientes; documentos académicos pueden corregirse/eliminarse en orden inverso (guía, comprobante, venta anulada), sin reciclar números. Las cuentas y datos son ficticios. No se implementa facturación electrónica.
+Compilación previa: 42 clases Java y 25 JSP; pruebas de Repository y HTTP completas sobre el servicio 3306 aprobadas. Se repiten comprobaciones finales después de integrar los cambios parciales y corregir UTF-8. Documentación del módulo creada con fragmentos reales; la verificación final y el commit se registran al concluir.
+
+
+## Verificación final y entrega (27/10/2026)
+- Ant de NetBeans: clean dist con Java 17 y Tomcat 9, BUILD SUCCESSFUL; 42 clases compiladas y WAR generado.
+- herramientas/verificar.py --bd: PBKDF2, Singleton con conexiones diferentes y pruebas transaccionales de ventas aprobadas en el servicio 3306. Incluye rollback, stock insuficiente, servicios, IGV, RUC, documentos únicos y concurrencia.
+- Pruebas HTTP sobre el proyecto original: 25 vistas, login, tres intentos, usuarios inexistentes/inactivos, desbloqueo, roles, CSRF, escape HTML, CRUD de usuarios y catálogos, y flujo completo de ventas aprobados. Los registros temporales se retiraron; pueden quedar saltos en numeradores.
+- Navegador: inicio de sesión, dashboard, clientes y nueva SOLPED. Se vieron correctamente Perú, María, algodón, Observación y Guías. Agregar y quitar ítems recalcula el total: 2 polos de S/ 35 = subtotal 70, IGV 12.60, total 82.60. No se guardó este pedido de revisión visual.
+- Los cuatro análisis existen, con bloques copiados literalmente del código y análisis crítico. PRUEBAS.md contiene ejecución en NetBeans, comandos fish, orden SQL, cambio de clave y límites de Render.
+- Configuración privada en 127.0.0.1:3306, ignorada por Git; sin instancia 3307 ni archivos de esa instancia dentro del proyecto. Dockerfile conserva exactamente su contenido inicial. No se realizó push.
+- Esta entrega se registra en el commit local «Etapa 6».
