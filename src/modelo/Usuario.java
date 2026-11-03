@@ -7,6 +7,7 @@ public class Usuario {
     private String apellidos;
     private String dni;
     private String correo;
+    private String nombreNegocio;
     private String usuario;
     private String claveHash;
     private String rol;
@@ -14,6 +15,8 @@ public class Usuario {
     private int intentosFallidos;
     private java.sql.Timestamp fechaCreacion;
     private java.sql.Timestamp ultimoAcceso;
+    private String tokenRecuperacion;
+    private java.sql.Timestamp tokenExpira;
 
     public int getIdUsuario() { return idUsuario; }
     public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
@@ -25,6 +28,8 @@ public class Usuario {
     public void setDni(String dni) { this.dni = dni; }
     public String getCorreo() { return correo; }
     public void setCorreo(String correo) { this.correo = correo; }
+    public String getNombreNegocio() { return nombreNegocio; }
+    public void setNombreNegocio(String nombreNegocio) { this.nombreNegocio = nombreNegocio; }
     public String getUsuario() { return usuario; }
     public void setUsuario(String usuario) { this.usuario = usuario; }
     public String getClaveHash() { return claveHash; }
@@ -39,4 +44,8 @@ public class Usuario {
     public void setFechaCreacion(java.sql.Timestamp fechaCreacion) { this.fechaCreacion = fechaCreacion; }
     public java.sql.Timestamp getUltimoAcceso() { return ultimoAcceso; }
     public void setUltimoAcceso(java.sql.Timestamp ultimoAcceso) { this.ultimoAcceso = ultimoAcceso; }
+    public String getTokenRecuperacion() { return tokenRecuperacion; }
+    public void setTokenRecuperacion(String tokenRecuperacion) { this.tokenRecuperacion = tokenRecuperacion; }
+    public java.sql.Timestamp getTokenExpira() { return tokenExpira; }
+    public void setTokenExpira(java.sql.Timestamp tokenExpira) { this.tokenExpira = tokenExpira; }
 }

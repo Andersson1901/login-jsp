@@ -46,7 +46,8 @@ public class UsuarioServlet extends HttpServlet {
                 u.setDni(Web.requerido(request,"dni",8)); if(!u.getDni().matches("[0-9]{8}")) throw new IllegalArgumentException("El DNI debe tener 8 dígitos.");
                 u.setCorreo(Web.requerido(request,"correo",150)); Web.correo(u.getCorreo());
                 u.setUsuario(Web.requerido(request,"usuario",50));
-                u.setRol(Web.opcion(Web.requerido(request,"rol",10),"ADMIN","VENDEDOR"));
+                u.setRol(Web.opcion(Web.requerido(request,"rol",10),"ADMIN","DUENO","VENDEDOR","CLIENTE"));
+                u.setNombreNegocio("DUENO".equals(u.getRol())?Web.requerido(request,"nombreNegocio",150):null);
                 u.setEstado(Web.opcion(Web.requerido(request,"estado",10),"ACTIVO","BLOQUEADO","INACTIVO"));
                 if(u.getIdUsuario()==0) { u.setClaveHash(Seguridad.generarHash(Web.clave(request))); usuarios.guardar(u); }
                 else {

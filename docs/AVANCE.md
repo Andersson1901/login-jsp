@@ -66,3 +66,19 @@ Compilación previa: 42 clases Java y 25 JSP; pruebas de Repository y HTTP compl
 - Los cuatro análisis existen, con bloques copiados literalmente del código y análisis crítico. PRUEBAS.md contiene ejecución en NetBeans, comandos fish, orden SQL, cambio de clave y límites de Render.
 - Configuración privada en 127.0.0.1:3306, ignorada por Git; sin instancia 3307 ni archivos de esa instancia dentro del proyecto. Dockerfile conserva exactamente su contenido inicial. No se realizó push.
 - Esta entrega se registra en el commit local «Etapa 6».
+
+
+## Etapa 7 — revisión e integración (03/11/2026)
+Git seguía en 64a53b2 (Etapa 6). Antigravity modificó Usuario.java y el mapeo de UsuarioRepositoryJDBC.java, y creó sql/05_registro_publico.sql. En MariaDB ya estaban aplicados los roles ADMIN/DUENO/VENDEDOR/CLIENTE y las columnas nombre_negocio, token_recuperacion y token_expira. Se respaldaron estos cambios fuera del repositorio y no se volvió a ejecutar el ALTER.
+
+Se completan RegistroServlet, RecuperarServlet y CatalogoServlet; los tres formularios de registro, recuperar.jsp, catalogo.jsp y los includes públicos. Se agregan los cinco enlaces del login, protección CSRF para formularios públicos, validaciones servidor, escape HTML, hash PBKDF2 y persistencia de nombre_negocio tanto al registrar como al editar. El CRUD ADMIN acepta los cuatro roles y conserva la protección de su propia cuenta.
+
+Decisiones: nombre de tienda es el dato del negocio ya preparado por Antigravity. CLIENTE entra al catálogo; DUENO/VENDEDOR acceden al panel operativo compartido, sin gestión de usuarios. No hay separación de inventarios por negocio. Todos los registros públicos quedan ACTIVO; el parámetro del navegador no puede asignar ADMIN ni cambiar el estado inicial. La recuperación solamente simula el envío, almacena un hash de token y su vencimiento de 15 minutos, sin enviar correo ni cambiar claves.
+
+Verificación: compilación Java 17 de 46 clases y páginas nuevas en Tomcat 9. Pruebas HTTP/BD de los tres registros, duplicados, validación, roles manipulados, hash, CSRF, desactivación, revocación de sesiones, token/caducidad, catálogo activo, búsqueda y XSS aprobadas. Se repitieron login/bloqueo, CRUD de usuarios, catálogos y flujo de ventas con resultado correcto. Navegador: enlaces del login, formulario de tienda y búsqueda «algodón», con tildes y diseño correctos.
+
+El borrador anterior de normalización de usuarios quedó fuera de este proyecto y nunca se aplicó a esta base. Esta etapa sigue el plan nuevo, que mantiene el ENUM rol. No se debe ejecutar el borrador 05_usuarios_normalizados.sql junto a 05_registro_publico.sql.
+
+Se conserva la conexión privada en 3306 y el Dockerfile original. No se hace push. El cierre se registra con un commit local de Etapa 7.
+
+Cierre verificado sobre el proyecto original: Ant `dist` BUILD SUCCESSFUL; `herramientas/verificar.py --bd` aprobó seguridad, Singleton y ventas con concurrencia; `test/PruebasPublicas.py` aprobó la Etapa 7 en Tomcat local. Se verificaron 45 fragmentos reales de los análisis, UTF-8, tablas utf8mb4, configuración privada ignorada y puerto 3307 sin servicio. Los datos temporales fueron retirados.

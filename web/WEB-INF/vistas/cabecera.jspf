@@ -15,6 +15,7 @@
 <div id="layoutSidenav"><div id="layoutSidenav_nav"><nav class="sb-sidenav accordion sb-sidenav-dark"><div class="sb-sidenav-menu"><div class="nav">
 <div class="sb-sidenav-menu-heading">ModaExpress Perú</div>
 <a class="nav-link" href="${pageContext.request.contextPath}/bienvenido.jsp">Inicio</a>
+<a class="nav-link" href="${pageContext.request.contextPath}/catalogo">Catálogo público</a>
 <c:if test="${sessionScope.rol == 'ADMIN'}"><a class="nav-link" href="${pageContext.request.contextPath}/usuarios">Usuarios</a></c:if>
 <a class="nav-link" href="${pageContext.request.contextPath}/clientes">Clientes</a><a class="nav-link" href="${pageContext.request.contextPath}/proveedores">Proveedores</a>
 <a class="nav-link" href="${pageContext.request.contextPath}/productos">Productos</a><a class="nav-link" href="${pageContext.request.contextPath}/ventas">Ventas</a>

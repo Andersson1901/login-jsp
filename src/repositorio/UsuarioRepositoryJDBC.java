@@ -20,6 +20,7 @@ public class UsuarioRepositoryJDBC implements UsuarioRepository {
         Usuario u = new Usuario();
         u.setIdUsuario(r.getInt("id_usuario")); u.setNombres(r.getString("nombres"));
         u.setApellidos(r.getString("apellidos")); u.setDni(r.getString("dni")); u.setCorreo(r.getString("correo"));
+        u.setNombreNegocio(r.getString("nombre_negocio"));
         u.setUsuario(r.getString("usuario")); u.setRol(r.getString("rol")); u.setEstado(r.getString("estado"));
         u.setIntentosFallidos(r.getInt("intentos_fallidos")); u.setFechaCreacion(r.getTimestamp("fecha_creacion"));
         u.setUltimoAcceso(r.getTimestamp("ultimo_acceso"));
@@ -42,17 +43,17 @@ public class UsuarioRepositoryJDBC implements UsuarioRepository {
     }
     private void parametros(PreparedStatement p, Usuario u) throws SQLException {
         p.setString(1,u.getNombres()); p.setString(2,u.getApellidos()); p.setString(3,u.getDni());
-        p.setString(4,u.getCorreo()); p.setString(5,u.getUsuario()); p.setString(6,u.getRol()); p.setString(7,u.getEstado());
+        p.setString(4,u.getCorreo()); p.setString(5,u.getUsuario()); p.setString(6,u.getRol()); p.setString(7,u.getEstado()); p.setString(8,u.getNombreNegocio());
     }
     public void guardar(Usuario u) throws SQLException {
-        try (Connection c=ConexionBD.getInstancia().getConexion(); PreparedStatement p=c.prepareStatement("INSERT INTO usuarios(nombres,apellidos,dni,correo,usuario,rol,estado,clave_hash) VALUES(?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS)) {
-            parametros(p,u); p.setString(8,u.getClaveHash()); p.executeUpdate();
+        try (Connection c=ConexionBD.getInstancia().getConexion(); PreparedStatement p=c.prepareStatement("INSERT INTO usuarios(nombres,apellidos,dni,correo,usuario,rol,estado,nombre_negocio,clave_hash) VALUES(?,?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS)) {
+            parametros(p,u); p.setString(9,u.getClaveHash()); p.executeUpdate();
             try (ResultSet r=p.getGeneratedKeys()) { if(r.next()) u.setIdUsuario(r.getInt(1)); }
         }
     }
     public void actualizar(Usuario u) throws SQLException {
-        try (Connection c=ConexionBD.getInstancia().getConexion(); PreparedStatement p=c.prepareStatement("UPDATE usuarios SET nombres=?,apellidos=?,dni=?,correo=?,usuario=?,rol=?,estado=?,intentos_fallidos=CASE WHEN ?='ACTIVO' THEN 0 ELSE intentos_fallidos END WHERE id_usuario=?")) {
-            parametros(p,u); p.setString(8,u.getEstado()); p.setInt(9,u.getIdUsuario());
+        try (Connection c=ConexionBD.getInstancia().getConexion(); PreparedStatement p=c.prepareStatement("UPDATE usuarios SET nombres=?,apellidos=?,dni=?,correo=?,usuario=?,rol=?,estado=?,nombre_negocio=?,intentos_fallidos=CASE WHEN ?='ACTIVO' THEN 0 ELSE intentos_fallidos END WHERE id_usuario=?")) {
+            parametros(p,u); p.setString(9,u.getEstado()); p.setInt(10,u.getIdUsuario());
             if(p.executeUpdate()==0) throw new IllegalArgumentException("El usuario ya no existe.");
         }
     }
@@ -67,8 +68,21 @@ public class UsuarioRepositoryJDBC implements UsuarioRepository {
         }
     }
     public void cambiarClave(Integer id, String hash) throws SQLException {
-        try (Connection c=ConexionBD.getInstancia().getConexion(); PreparedStatement p=c.prepareStatement("UPDATE usuarios SET clave_hash=? WHERE id_usuario=?")) {
+        try (Connection c=ConexionBD.getInstancia().getConexion(); PreparedStatement p=c.prepareStatement("UPDATE usuarios SET clave_hash=?,token_recuperacion=NULL,token_expira=NULL WHERE id_usuario=?")) {
             p.setString(1,hash); p.setInt(2,id); p.executeUpdate();
+        }
+    }
+    @Override public void simularRecuperacion(String correo) throws SQLException {
+        // El token nunca se devuelve al navegador ni se escribe en los registros.
+        byte[] aleatorio=new byte[32];
+        new java.security.SecureRandom().nextBytes(aleatorio);
+        String hash;
+        try {
+            hash=java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(aleatorio));
+        } catch(java.security.NoSuchAlgorithmException e) { throw new IllegalStateException(e); }
+        try(Connection c=ConexionBD.getInstancia().getConexion();
+            PreparedStatement p=c.prepareStatement("UPDATE usuarios SET token_recuperacion=?,token_expira=DATE_ADD(NOW(),INTERVAL 15 MINUTE) WHERE correo=? AND estado='ACTIVO'")) {
+            p.setString(1,hash); p.setString(2,correo); p.executeUpdate();
         }
     }
     private static final String HASH_SIMULADO = Seguridad.generarHash("ComparacionDeTiempo");

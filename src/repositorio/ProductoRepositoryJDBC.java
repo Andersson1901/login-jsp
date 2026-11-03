@@ -31,6 +31,15 @@ public class ProductoRepositoryJDBC implements ProductoRepository {
         }
         return lista;
     }
+    @Override public List<Producto> listarActivos(String busqueda) throws SQLException {
+        List<Producto> lista=new ArrayList<>();
+        try(Connection c=ConexionBD.getInstancia().getConexion();
+            PreparedStatement p=c.prepareStatement("SELECT * FROM productos WHERE estado='ACTIVO' AND (nombre LIKE ? OR categoria LIKE ? OR codigo LIKE ?) ORDER BY nombre")) {
+            for(int i=1;i<=3;i++) p.setString(i,"%"+busqueda+"%");
+            try(ResultSet r=p.executeQuery()) { while(r.next()) lista.add(mapear(r)); }
+        }
+        return lista;
+    }
     @Override public Producto buscarPorId(Integer id) throws SQLException {
         try(Connection c=ConexionBD.getInstancia().getConexion(); PreparedStatement p=c.prepareStatement("SELECT * FROM productos WHERE id_producto=?")) {
             p.setInt(1,id); try(ResultSet r=p.executeQuery()) { return r.next()?mapear(r):null; }

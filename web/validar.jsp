@@ -24,8 +24,9 @@ try {
         nueva.setAttribute("idUsuario", usuario.getIdUsuario());
         nueva.setAttribute("nombreUsuario", usuario.getNombres());
         nueva.setAttribute("rol", usuario.getRol());
+        nueva.setAttribute("csrf", java.util.UUID.randomUUID().toString());
         nueva.setMaxInactiveInterval(1800);
-        response.sendRedirect("bienvenido.jsp");
+        response.sendRedirect("CLIENTE".equals(usuario.getRol()) ? "catalogo" : "bienvenido.jsp");
     } else {
         int intentos;
         synchronized (session) {

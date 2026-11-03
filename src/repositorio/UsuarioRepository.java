@@ -11,5 +11,6 @@ public interface UsuarioRepository extends Repository<Usuario, Integer> {
     Usuario buscarPorUsuario(String usuario) throws SQLException;
     void desbloquear(Integer id) throws SQLException;
     void cambiarClave(Integer id, String hash) throws SQLException;
+    void simularRecuperacion(String correo) throws SQLException;
     ResultadoAcceso autenticar(String nombre, String clave) throws SQLException;
 }

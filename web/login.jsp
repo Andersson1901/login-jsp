@@ -110,6 +110,10 @@
             font-size: 14px;
             margin-bottom: 16px;
         }
+        .accesos { margin-top: 22px; padding-top: 14px; border-top: 1px solid #d5dcec; font-size: 13px; line-height: 1.7; }
+        .accesos p { margin: 7px 0; }
+        .accesos a { color: #0d1f4d; font-weight: 600; }
+        .exito { padding: 12px; background: #e8f5ee; color: #165c36; border-radius: 8px; margin-bottom: 16px; }
         .foot { margin-top: 22px; text-align: center; font-size: 12px; color: #8a93ab; }
         @media (max-width: 720px) {
             .card { flex-direction: column; }
@@ -149,6 +153,9 @@
                 <div class="error">Usuario o contraseña incorrectos</div>
             <% } %>
 
+            <% if ("1".equals(request.getParameter("registro"))) { %>
+                <div class="exito" role="status">Tu cuenta está activa. Ya puedes iniciar sesión.</div>
+            <% } %>
             <form action="validar.jsp" method="post">
                 <div class="field">
                     <label for="usuario">Usuario</label>
@@ -161,6 +168,12 @@
                 </div>
                 <button type="submit" class="btn">Ingresar</button>
             </form>
+            <div class="accesos">
+                <p><a href="recuperar.jsp">¿Olvidaste tu contraseña?</a></p>
+                <p>¿Eres dueño de tienda? <a href="registro_tienda.jsp">Registra tu tienda</a></p>
+                <p>¿Eres vendedor? <a href="solicitud_vendedor.jsp">Solicita ser vendedor</a></p>
+                <p>¿Quieres comprar? <a href="registro_comprador.jsp">Crea tu cuenta de comprador</a> o <a href="catalogo">mira la tienda</a></p>
+            </div>
 
         
         </div>

@@ -9,7 +9,9 @@ import javax.servlet.http.*;
 
 @WebFilter("/*")
 public class SesionFilter implements Filter {
-    private static final Set<String> PUBLICAS = Set.of("/", "/index.jsp", "/login.jsp", "/validar.jsp", "/bloqueado.jsp");
+    private static final Set<String> PUBLICAS = Set.of("/", "/index.jsp", "/login.jsp", "/validar.jsp", "/bloqueado.jsp",
+            "/registro_comprador.jsp", "/registro_tienda.jsp", "/solicitud_vendedor.jsp",
+            "/recuperar.jsp", "/catalogo.jsp", "/registro", "/recuperar", "/catalogo");
 
     @Override
     public void doFilter(ServletRequest peticion, ServletResponse respuesta, FilterChain cadena)
@@ -20,11 +22,11 @@ public class SesionFilter implements Filter {
         response.setCharacterEncoding("UTF-8");
         response.setHeader("X-Content-Type-Options", "nosniff");
         String ruta = request.getServletPath();
+        response.setHeader("Cache-Control", "no-store");
         if (PUBLICAS.contains(ruta) || ruta.startsWith("/assets/")) {
             cadena.doFilter(request, response);
             return;
         }
-        response.setHeader("Cache-Control", "no-store");
         HttpSession sesion = request.getSession(false);
         if (sesion == null || sesion.getAttribute("usuario") == null) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
@@ -53,6 +55,18 @@ public class SesionFilter implements Filter {
             response.setStatus(403);
             response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().write("La solicitud venció. Recarga la página e intenta nuevamente.");
+            return;
+        }
+        // Los compradores usan el catálogo público; no acceden a los datos internos.
+        String rol=(String)sesion.getAttribute("rol");
+        if (!Set.of("ADMIN","DUENO","VENDEDOR").contains(rol) && !ruta.equals("/logout.jsp")) {
+            if ("GET".equals(request.getMethod()) && ruta.equals("/bienvenido.jsp")) {
+                response.sendRedirect(request.getContextPath()+"/catalogo");
+            } else {
+                response.setStatus(403);
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write("Tu cuenta permite consultar el catálogo de la tienda.");
+            }
             return;
         }
         if (ruta.equals("/usuarios") && !"ADMIN".equals(sesion.getAttribute("rol"))) {

@@ -1,0 +1,24 @@
+/* Autor: Rodriguez Alvarado Andersson Eduardo */
+body { background: #f3f5fa; color: #0d1f4d; font-family: "Segoe UI", Arial, sans-serif; }
+.cabecera-publica { background: #0d1f4d; color: white; border-bottom: 3px solid #e0b83c; }
+.cabecera-publica a { color: white; text-decoration: none; }
+.marca-publica { font-size: 1.35rem; font-weight: 700; white-space: nowrap; }
+.marca-publica span { color: #e0b83c; }
+.marca-publica small { font-size: .9rem; font-weight: 400; }
+.btn-dorado, .cabecera-publica .btn-dorado { background: #e0b83c; color: #0d1f4d; font-weight: 600; }
+.btn-dorado:hover { background: #edc953; color: #0d1f4d; }
+.btn-marino { background: #0d1f4d; color: white; }
+.btn-marino:hover { background: #18356e; color: white; }
+.formulario-publico { max-width: 720px; }
+.etiqueta-publica { color: #685000; font-size: .8rem; font-weight: 700; letter-spacing: .1em; }
+.hero-catalogo { background: #0d1f4d; color: white; border-radius: 1rem; }
+.hero-catalogo .etiqueta-publica { color: #e0b83c; }
+.hero-catalogo h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
+.buscador-publico { flex: 1; min-width: 200px; }
+.categoria-publica { background: #f6edce; color: #5c4700; }
+.precio-publico { font-size: 1.45rem; font-weight: 700; }
+.producto-publico, .card { border-radius: .8rem; }
+.producto-publico h2, .producto-publico p { overflow-wrap: anywhere; }
+.pie-publico { color: #5b6680; border-top: 1px solid #dce1ec; font-size: .9rem; }
+.pie-publico a { color: #0d1f4d; }
+a:focus-visible, button:focus-visible { outline: 3px solid #e0b83c; outline-offset: 3px; }

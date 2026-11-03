@@ -2,7 +2,7 @@
 # Cómo ejecutar y probar ModaExpress Perú
 
 ## Estado entregado
-Proyecto Ant en `/home/ander/NetBeansProjects/LoginJSP`, Java 17 y Tomcat 9 (`javax.servlet`). Usa el servicio MariaDB existente en `127.0.0.1:3306`. No se utiliza ni se conserva una instancia 3307 dentro del proyecto. Los scripts 01–04 ya fueron aplicados a esta base durante el trabajo; no volver a ejecutarlos sobre ella.
+Proyecto Ant en `/home/ander/NetBeansProjects/LoginJSP`, Java 17 y Tomcat 9 (`javax.servlet`). Usa el servicio MariaDB existente en `127.0.0.1:3306`. No se utiliza ni se conserva una instancia 3307 dentro del proyecto. Los scripts 01–05 ya fueron aplicados a esta base durante el trabajo; no volver a ejecutarlos sobre ella.
 
 ## NetBeans
 1. Abre el proyecto LoginJSP.
@@ -22,6 +22,7 @@ mariadb --default-character-set=utf8mb4 -h 127.0.0.1 -P 3306 -u moda_dev -p < sq
 mariadb --default-character-set=utf8mb4 -h 127.0.0.1 -P 3306 -u moda_dev -p < sql/02_usuarios_seguros.sql
 mariadb --default-character-set=utf8mb4 -h 127.0.0.1 -P 3306 -u moda_dev -p < sql/03_catalogos.sql
 mariadb --default-character-set=utf8mb4 -h 127.0.0.1 -P 3306 -u moda_dev -p < sql/04_ventas.sql
+mariadb --default-character-set=utf8mb4 -h 127.0.0.1 -P 3306 -u moda_dev -p < sql/05_registro_publico.sql
 ```
 
 La única contraseña de aplicación en texto plano está en 01, como pide la etapa 2; 02 la sustituye por PBKDF2. Los cambios de Git no revierten la base: para probar un commit antiguo, usa una base nueva con los scripts correspondientes a esa etapa. No elimines datos actuales para volver atrás.
@@ -69,3 +70,21 @@ El contador de nombres inexistentes vive en la sesión y puede reiniciarse al bo
 
 ## Render, sin modificarlo
 El Dockerfile original solo copia web/. Para publicar habría que compilar las clases Java 17 con las librerías de Tomcat, copiar el resultado a WEB-INF/classes, incluir los JAR de WEB-INF/lib y configurar una MariaDB accesible desde Render con credenciales privadas y TLS. No incluir el archivo privado de desarrollo en una imagen pública. No se modificó Dockerfile ni se hizo git push.
+
+
+## Etapa 7: registro público, recuperación simulada y catálogo
+Desde el login están disponibles los tres registros, la recuperación y el catálogo. Comprador crea CLIENTE; tienda crea DUENO y exige nombre del negocio; vendedor crea VENDEDOR. Todos quedan ACTIVO sin aprobación. No se permite crear ADMIN desde el registro público.
+
+CLIENTE inicia sesión en el catálogo y no puede abrir ni modificar usuarios, clientes, proveedores, productos o ventas. DUENO y VENDEDOR usan el panel operativo compartido; solo ADMIN administra usuarios y puede desactivar cualquiera de las cuentas. El nombre de negocio es un dato de la cuenta: esta etapa no crea inventarios separados por tienda ni compras en línea.
+
+Recuperación: introduce un correo válido en recuperar.jsp. Si pertenece a una cuenta ACTIVO, se guarda un token aleatorio protegido con SHA-256 y una caducidad de 15 minutos. El mensaje es igual si el correo no existe. Es una simulación: no se envía correo, no se expone el token y no se cambia la contraseña. El cambio real de clave continúa disponible para ADMIN en Usuarios.
+
+Catálogo: `/catalogo` o `/catalogo.jsp`, sin sesión. Muestra solo productos activos, búsqueda, precios sin IGV y disponibilidad. No expone precios de compra ni ofrece operaciones de escritura.
+
+Prueba automatizada adicional (requiere Tomcat iniciado, cliente mariadb y la BD de desarrollo configurada):
+
+```fish
+python3 test/PruebasPublicas.py http://localhost:8080/LoginJSP/
+```
+
+Esta prueba usa admin/1234, registra cuentas ficticias, comprueba validaciones, hashes, permisos, desactivación, CSRF, recuperación y catálogo; elimina sus registros al terminar. No usa ni envía correos reales. La base actual ya tenía el script 05 aplicado por Antigravity; no hay que repetirlo.

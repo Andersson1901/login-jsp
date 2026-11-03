@@ -1,0 +1,6 @@
+<%-- Autor: Rodriguez Alvarado Andersson Eduardo --%>
+<%@page pageEncoding="UTF-8"%>
+</main>
+<footer class="container py-4 pie-publico">ModaExpress Perú · Tienda académica de ropa
+<div class="mt-2"><a href="${pageContext.request.contextPath}/registro_tienda.jsp">Registra tu tienda</a> · <a href="${pageContext.request.contextPath}/solicitud_vendedor.jsp">Solicita ser vendedor</a></div>
+</footer></body></html>
