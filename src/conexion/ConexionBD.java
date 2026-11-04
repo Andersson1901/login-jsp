@@ -20,6 +20,16 @@ public class ConexionBD {
         } catch (IOException e) {
             throw new IllegalStateException("No se pudo leer la configuración de conexión", e);
         }
+        aplicarVariable("DB_URL", "url");
+        aplicarVariable("DB_USUARIO", "usuario");
+        aplicarVariable("DB_CLAVE", "clave");
+    }
+
+    private void aplicarVariable(String nombre, String propiedad) {
+        String valor = System.getenv(nombre);
+        if (valor != null && !valor.isBlank()) {
+            configuracion.setProperty(propiedad, valor);
+        }
     }
 
     private static class Contenedor {
