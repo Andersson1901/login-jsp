@@ -3,6 +3,8 @@ package repositorio;
 
 import conexion.ConexionBD;
 import modelo.*;
+import observador.EventoVenta;
+import observador.SujetoVenta;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
@@ -36,8 +38,12 @@ public class VentaRepositoryJDBC implements VentaRepository {
         if(v==null || !"EMITIDA".equals(v.getEstado())) throw new IllegalArgumentException("La venta debe estar emitida.");
         return v;
     }
+    // Se avisa a los observadores cuando la transacción ya fue confirmada.
+    private static void avisar(Venta venta,String estadoAnterior,String estadoNuevo) {
+        SujetoVenta.getInstancia().notificar(new EventoVenta(venta,estadoAnterior,estadoNuevo));
+    }
     @Override public int crearDesdeSolped(Integer idSolped,Integer idUsuario) throws SQLException {
-        return OperacionVentaJDBC.transaccion(c -> {
+        Venta emitida=OperacionVentaJDBC.transaccion(c -> {
             Solped s=new SolpedRepositoryJDBC().buscar(c,idSolped,true);
             if(s==null || !"APROBADA".equals(s.getEstado())) throw new IllegalArgumentException("Solo una SOLPED APROBADA puede convertirse en venta.");
             OperacionVentaJDBC.clienteActivo(c,s.getIdCliente());
@@ -52,8 +58,10 @@ public class VentaRepositoryJDBC implements VentaRepository {
             }
             OperacionVentaJDBC.guardarDetalles(c,true,id,s.getDetalles());
             try(PreparedStatement p=c.prepareStatement("UPDATE solped SET estado='ATENDIDA' WHERE id_solped=?")) { p.setInt(1,idSolped); p.executeUpdate(); }
-            return id;
+            return buscar(c,id,false);
         });
+        avisar(emitida,null,"EMITIDA");
+        return emitida.getIdVenta();
     }
     @Override public void guardar(Venta venta) throws SQLException {
         venta.setIdVenta(crearDesdeSolped(venta.getIdSolped(),venta.getIdUsuario()));
@@ -77,13 +85,15 @@ public class VentaRepositoryJDBC implements VentaRepository {
         });
     }
     @Override public void anular(Integer id) throws SQLException {
-        OperacionVentaJDBC.transaccion(c -> {
+        Venta anulada=OperacionVentaJDBC.transaccion(c -> {
             Venta actual=exigirEmitida(c,id);
             OperacionVentaJDBC.moverStock(c,actual.getDetalles(),false);
             try(PreparedStatement p=c.prepareStatement("UPDATE venta SET estado='ANULADA' WHERE id_venta=?")) { p.setInt(1,id); p.executeUpdate(); }
             try(PreparedStatement p=c.prepareStatement("UPDATE guia_remision SET estado='ANULADA' WHERE id_venta=?")) { p.setInt(1,id); p.executeUpdate(); }
-            return null;
+            actual.setEstado("ANULADA");
+            return actual;
         });
+        avisar(anulada,"EMITIDA","ANULADA");
     }
     @Override public void eliminar(Integer id) throws SQLException {
         OperacionVentaJDBC.transaccion(c -> {

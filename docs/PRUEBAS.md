@@ -2,7 +2,7 @@
 # Cómo ejecutar y probar ModaExpress Perú
 
 ## Estado entregado
-Proyecto Ant en `/home/ander/NetBeansProjects/LoginJSP`, Java 17 y Tomcat 9 (`javax.servlet`). Usa el servicio MariaDB existente en `127.0.0.1:3306`. No se utiliza ni se conserva una instancia 3307 dentro del proyecto. Los scripts 01–05 ya fueron aplicados a esta base durante el trabajo; no volver a ejecutarlos sobre ella.
+Proyecto Ant en `/home/ander/NetBeansProjects/LoginJSP`, Java 17 y Tomcat 9 (`javax.servlet`). Usa el servicio MariaDB existente en `127.0.0.1:3306`. No se utiliza ni se conserva una instancia 3307 dentro del proyecto. Los scripts 01–05 ya fueron aplicados a esta base durante el trabajo; no volver a ejecutarlos sobre ella. El script 06 (Etapa 8, Observer de ventas) es nuevo: aplícalo una sola vez antes de ejecutar la aplicación.
 
 ## NetBeans
 1. Abre el proyecto LoginJSP.
@@ -23,6 +23,7 @@ mariadb --default-character-set=utf8mb4 -h 127.0.0.1 -P 3306 -u moda_dev -p < sq
 mariadb --default-character-set=utf8mb4 -h 127.0.0.1 -P 3306 -u moda_dev -p < sql/03_catalogos.sql
 mariadb --default-character-set=utf8mb4 -h 127.0.0.1 -P 3306 -u moda_dev -p < sql/04_ventas.sql
 mariadb --default-character-set=utf8mb4 -h 127.0.0.1 -P 3306 -u moda_dev -p < sql/05_registro_publico.sql
+mariadb --default-character-set=utf8mb4 -h 127.0.0.1 -P 3306 -u moda_dev -p < sql/06_observer_ventas.sql
 ```
 
 La única contraseña de aplicación en texto plano está en 01, como pide la etapa 2; 02 la sustituye por PBKDF2. Los cambios de Git no revierten la base: para probar un commit antiguo, usa una base nueva con los scripts correspondientes a esa etapa. No elimines datos actuales para volver atrás.
@@ -57,7 +58,7 @@ python3 herramientas/verificar.py
 python3 herramientas/verificar.py --bd
 ```
 
-La primera orden compila con Java 17 usando las librerías del Tomcat configurado en NetBeans. `--bd` ejecuta PruebasSeguridad y PruebasVentas: PBKDF2, Singleton, CRUD, IGV, RUC, unicidad, rollback y dos peticiones simultáneas que disputan stock. Las pruebas de ventas crean y eliminan sus registros de prueba; pueden dejar saltos en correlativos e IDs, que no se reutilizan. No ejecutarlas en una base de producción.
+La primera orden compila con Java 17 usando las librerías del Tomcat configurado en NetBeans. `--bd` ejecuta PruebasSeguridad, PruebasVentas y PruebasObservador (esta última requiere el script 06): PBKDF2, Singleton, CRUD, IGV, RUC, unicidad, rollback y dos peticiones simultáneas que disputan stock. Las pruebas de ventas crean y eliminan sus registros de prueba; pueden dejar saltos en correlativos e IDs, que no se reutilizan. No ejecutarlas en una base de producción.
 
 También se probaron por HTTP las 25 vistas JSP, roles, CSRF, escape HTML, bloqueo y los cuatro CRUD más el proceso de ventas. Se verificaron visualmente las tildes, la cabecera compartida y agregar/quitar ítems en navegador. Los JSP tienen pageEncoding UTF-8 y cada página HTML tiene meta charset UTF-8 a través de su head; los includes de cuerpo no duplican la etiqueta meta.
 
@@ -88,3 +89,17 @@ python3 test/PruebasPublicas.py http://localhost:8080/LoginJSP/
 ```
 
 Esta prueba usa admin/1234, registra cuentas ficticias, comprueba validaciones, hashes, permisos, desactivación, CSRF, recuperación y catálogo; elimina sus registros al terminar. No usa ni envía correos reales. La base actual ya tenía el script 05 aplicado por Antigravity; no hay que repetirlo.
+
+
+## Etapa 8: Observer de ventas para el dueño de tienda
+Aplica `sql/06_observer_ventas.sql` una sola vez, reconstruye y vuelve a desplegar. Con una cuenta DUENO ACTIVO (créala desde registro_tienda.jsp o desde Usuarios como ADMIN):
+
+- Con otra sesión (admin o vendedor1), emite una venta desde una SOLPED aprobada y luego anúlala. El dueño ve, en el dashboard, «Tienes N aviso(s) de ventas sin leer» y, en el menú Notificaciones, un aviso «Venta emitida» y otro «EMITIDA → ANULADA», ambos marcados como Nueva.
+- «Marcar todas como leídas» quita las marcas y el aviso del dashboard.
+- Una venta rechazada (por ejemplo, stock insuficiente) no genera avisos.
+- Si se elimina una venta anulada, sus avisos permanecen sin el botón «Ver venta».
+- Un usuario ADMIN, VENDEDOR o CLIENTE que abra `/notificaciones` recibe 403. Una cuenta DUENO INACTIVO no recibe avisos.
+
+Prueba automatizada: `python3 herramientas/verificar.py --bd` ejecuta también PruebasObservador. La primera parte no usa la base; la segunda crea tres usuarios, un cliente y un producto de prueba, comprueba los avisos y los elimina al terminar. `java -cp <clases> PruebasObservador --sin-bd` ejecuta solo la primera parte.
+
+Límites: los avisos son síncronos y de mejor esfuerzo (si un observador falla solo queda un registro en el log), no se envían correos y no hay separación de avisos por tienda. Se listan los últimos 100.

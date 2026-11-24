@@ -82,3 +82,13 @@ El borrador anterior de normalización de usuarios quedó fuera de este proyecto
 Se conserva la conexión privada en 3306 y el Dockerfile original. No se hace push. El cierre se registra con un commit local de Etapa 7.
 
 Cierre verificado sobre el proyecto original: Ant `dist` BUILD SUCCESSFUL; `herramientas/verificar.py --bd` aprobó seguridad, Singleton y ventas con concurrencia; `test/PruebasPublicas.py` aprobó la Etapa 7 en Tomcat local. Se verificaron 45 fragmentos reales de los análisis, UTF-8, tablas utf8mb4, configuración privada ignorada y puerto 3307 sin servicio. Los datos temporales fueron retirados.
+
+
+## Etapa 8 — Patrón Observer en el cambio de estado de una venta
+Se agrega el patrón Observer (suscripción) al cambio de estado de una venta. Nuevo paquete `observador` con `ObservadorVenta`, `EventoVenta`, `SujetoVenta` (único, con el mismo contenedor estático de `ConexionBD`), `NotificadorDueno` y `SuscripcionVentas`, que suscribe al iniciar la aplicación. `VentaRepositoryJDBC` avisa al sujeto después del commit en `crearDesdeSolped` (EMITIDA) y `anular` (EMITIDA → ANULADA); la firma de ambos métodos no cambia. Un fallo de un observador se registra y no revierte la venta.
+
+Persistencia y pantalla: script `sql/06_observer_ventas.sql` (tabla `notificacion`), modelo `Notificacion`, `NotificacionRepository`/`NotificacionRepositoryJDBC` y fábrica `Repositorios.notificaciones()`. `NotificacionServlet` y `notificaciones.jsp` listan los avisos del dueño y los marcan como leídos con POST y CSRF; el filtro limita `/notificaciones` al rol DUENO. El menú muestra «Notificaciones» solo a DUENO y el dashboard avisa cuántos hay sin leer.
+
+Decisiones: todos los DUENO activos reciben cada aviso porque el proyecto no separa las tiendas; ADMIN y VENDEDOR no reciben avisos. Se notifican solo la emisión y la anulación. Al eliminar una venta, sus avisos se conservan sin enlace. No se envían correos.
+
+Verificación: las clases que no dependen de la API de servlets compilan con javac 17 y `PruebasObservador --sin-bd` aprobó suscripción, cancelación, duplicados y aislamiento de fallos. `NotificacionServlet`, `ResumenServlet`, `SesionFilter` y `SuscripcionVentas` se comprobaron solo contra interfaces mínimas de servlet, no contra Tomcat. Pendiente en NetBeans/Tomcat y MariaDB: aplicar el script 06, `python3 herramientas/verificar.py --bd` y el recorrido manual de PRUEBAS.md. Análisis en `docs/analisis_observer.md`.

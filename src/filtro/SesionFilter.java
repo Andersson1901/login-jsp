@@ -75,6 +75,12 @@ public class SesionFilter implements Filter {
             response.getWriter().write("No tienes permiso para administrar usuarios.");
             return;
         }
+        if (ruta.equals("/notificaciones") && !"DUENO".equals(sesion.getAttribute("rol"))) {
+            response.setStatus(403);
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("Las notificaciones de ventas son para el dueño de la tienda.");
+            return;
+        }
         cadena.doFilter(request, response);
     }
 }

@@ -17,6 +17,7 @@
 <a class="nav-link" href="${pageContext.request.contextPath}/bienvenido.jsp">Inicio</a>
 <a class="nav-link" href="${pageContext.request.contextPath}/catalogo">Catálogo público</a>
 <c:if test="${sessionScope.rol == 'ADMIN'}"><a class="nav-link" href="${pageContext.request.contextPath}/usuarios">Usuarios</a></c:if>
+<c:if test="${sessionScope.rol == 'DUENO'}"><a class="nav-link" href="${pageContext.request.contextPath}/notificaciones">Notificaciones</a></c:if>
 <a class="nav-link" href="${pageContext.request.contextPath}/clientes">Clientes</a><a class="nav-link" href="${pageContext.request.contextPath}/proveedores">Proveedores</a>
 <a class="nav-link" href="${pageContext.request.contextPath}/productos">Productos</a><a class="nav-link" href="${pageContext.request.contextPath}/ventas">Ventas</a>
 </div></div><div class="sb-sidenav-footer">Sesión: <c:out value="${sessionScope.usuario}"/><br><small><c:out value="${sessionScope.rol}"/></small></div></nav></div>
