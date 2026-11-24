@@ -1,5 +1,6 @@
 // Autor: Rodriguez Alvarado Andersson Eduardo
 package controlador;
+import repositorio.NotificacionRepository;
 import repositorio.ResumenRepository;
 import repositorio.Repositorios;
 import java.io.IOException;
@@ -11,9 +12,14 @@ import javax.servlet.http.*;
 @WebServlet("/resumen")
 public class ResumenServlet extends HttpServlet {
     private final ResumenRepository repositorio = Repositorios.resumen();
+    private final NotificacionRepository notificaciones = Repositorios.notificaciones();
     @Override protected void doGet(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException {
         try { request.setAttribute("resumen",repositorio.obtener()); }
         catch(SQLException e) { log("No se pudo cargar el resumen",e); request.setAttribute("errorResumen",true); }
+        if("DUENO".equals(request.getSession().getAttribute("rol"))) {
+            try { request.setAttribute("sinLeer",notificaciones.contarNoLeidas((Integer)request.getSession().getAttribute("idUsuario"))); }
+            catch(SQLException e) { log("No se pudieron contar las notificaciones",e); }
+        }
         request.getRequestDispatcher("/WEB-INF/vistas/resumen.jsp").include(request,response);
     }
 }

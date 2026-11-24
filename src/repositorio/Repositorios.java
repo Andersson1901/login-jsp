@@ -13,4 +13,5 @@ public final class Repositorios {
     public static VentaRepository ventas() { return new VentaRepositoryJDBC(); }
     public static ComprobanteRepository comprobantes() { return new ComprobanteRepositoryJDBC(); }
     public static GuiaRepository guias() { return new GuiaRepositoryJDBC(); }
+    public static NotificacionRepository notificaciones() { return new NotificacionRepositoryJDBC(); }
 }
