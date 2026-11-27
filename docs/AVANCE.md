@@ -83,8 +83,16 @@ Se conserva la conexión privada en 3306 y el Dockerfile original. No se hace pu
 
 Cierre verificado sobre el proyecto original: Ant `dist` BUILD SUCCESSFUL; `herramientas/verificar.py --bd` aprobó seguridad, Singleton y ventas con concurrencia; `test/PruebasPublicas.py` aprobó la Etapa 7 en Tomcat local. Se verificaron 45 fragmentos reales de los análisis, UTF-8, tablas utf8mb4, configuración privada ignorada y puerto 3307 sin servicio. Los datos temporales fueron retirados.
 
+<<<<<<< HEAD
+
+## Corrección de conexión en Azure (03/11/2026)
+
+El WAR local preparado para Azure no contenía referencias a DB_URL ni System.getenv: ignoraba las variables configuradas en App Service y usaba los valores locales. ConexionBD ahora aplica DB_URL, DB_USUARIO y DB_CLAVE después de cargar la configuración local, conservando exactamente los valores recibidos. Variables ausentes o vacías conservan el comportamiento de desarrollo. La configuración se carga una vez por aplicación; requiere volver a desplegar el WAR corregido.
+
+Validación: Ant clean dist compiló las 46 clases; pruebas aisladas confirmaron prioridad de variables de entorno sobre el archivo local, conservación de espacios en la clave y funcionamiento local con variables ausentes/vacías. Se generó dist/LoginJSP-azure.war sin conexion.properties y se verificó que su clase compilada lee las tres variables. La comprobación de conexión y registro en Azure queda pendiente de subir este WAR; no se dispone de acceso administrativo al servicio remoto.
 
 ## Etapa 8 — Patrón Observer en el cambio de estado de una venta
+
 Se agrega el patrón Observer (suscripción) al cambio de estado de una venta. Nuevo paquete `observador` con `ObservadorVenta`, `EventoVenta`, `SujetoVenta` (único, con el mismo contenedor estático de `ConexionBD`), `NotificadorDueno` y `SuscripcionVentas`, que suscribe al iniciar la aplicación. `VentaRepositoryJDBC` avisa al sujeto después del commit en `crearDesdeSolped` (EMITIDA) y `anular` (EMITIDA → ANULADA); la firma de ambos métodos no cambia. Un fallo de un observador se registra y no revierte la venta.
 
 Persistencia y pantalla: script `sql/06_observer_ventas.sql` (tabla `notificacion`), modelo `Notificacion`, `NotificacionRepository`/`NotificacionRepositoryJDBC` y fábrica `Repositorios.notificaciones()`. `NotificacionServlet` y `notificaciones.jsp` listan los avisos del dueño y los marcan como leídos con POST y CSRF; el filtro limita `/notificaciones` al rol DUENO. El menú muestra «Notificaciones» solo a DUENO y el dashboard avisa cuántos hay sin leer.
