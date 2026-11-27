@@ -2,6 +2,7 @@
 package controlador;
 import repositorio.NotificacionRepository;
 import repositorio.Repositorios;
+import util.Paginacion;
 import util.Web;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -14,7 +15,8 @@ import javax.servlet.http.*;
 public class NotificacionServlet extends HttpServlet {
     private final NotificacionRepository repositorio = Repositorios.notificaciones();
     @Override protected void doGet(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException {
-        try { request.setAttribute("registros",repositorio.listarPorUsuario(usuario(request))); }
+        try { Paginacion.listar(request,Paginacion.consulta(request,""),consulta -> repositorio.buscar(usuario(request),consulta)); }
+        catch(IllegalArgumentException e) { request.setAttribute("error",e.getMessage()); }
         catch(SQLException e) { log("Error al consultar notificaciones",e); request.setAttribute("error","No se pudo cargar la información."); }
         request.getRequestDispatcher("/WEB-INF/vistas/notificaciones.jsp").forward(request,response);
     }

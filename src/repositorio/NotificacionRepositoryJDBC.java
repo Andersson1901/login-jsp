@@ -1,6 +1,8 @@
 // Autor: Rodriguez Alvarado Andersson Eduardo
 package repositorio;
 import conexion.ConexionBD;
+import modelo.Consulta;
+import modelo.Pagina;
 import modelo.Notificacion;
 import modelo.Venta;
 import java.sql.*;
@@ -22,6 +24,10 @@ public class NotificacionRepositoryJDBC implements NotificacionRepository {
             if(estadoAnterior==null) p.setNull(4,Types.VARCHAR); else p.setString(4,estadoAnterior);
             p.setString(5,estadoNuevo); p.setBigDecimal(6,venta.getTotal()); p.executeUpdate();
         }
+    }
+    private static final Map<String,String> COLUMNAS=Paginador.columnas("fecha","fecha","venta","nro_venta","cliente","cliente","total","total","cambio","estado_nuevo");
+    @Override public Pagina<Notificacion> buscar(int idUsuario,Consulta consulta) throws SQLException {
+        return new Paginador("SELECT * FROM notificacion",COLUMNAS,"fecha DESC,id_notificacion DESC","id_notificacion").fijo("id_usuario=?",idUsuario).buscar(consulta,this::mapear);
     }
     @Override public List<Notificacion> listarPorUsuario(int idUsuario) throws SQLException {
         List<Notificacion> lista=new ArrayList<>();

@@ -13,6 +13,10 @@ public class ComprobanteRepositoryJDBC implements ComprobanteRepository {
         d.setSerie(r.getString("serie")); d.setNumero(r.getInt("numero")); d.setIdVenta(r.getInt("id_venta"));
         d.setNroVenta(r.getString("nro_venta")); d.setFechaEmision(r.getTimestamp("fecha_emision")); d.setTotal(r.getBigDecimal("total")); return d;
     }
+    private static final Map<String,String> COLUMNAS=Paginador.columnas("serie","d.serie","tipo","d.tipo","venta","v.nro_venta","fecha","d.fecha_emision","total","d.total");
+    @Override public Pagina<Comprobante> buscar(Consulta consulta) throws SQLException {
+        return new Paginador(CONSULTA,COLUMNAS,"d.id_comprobante DESC","d.id_comprobante").buscar(consulta,this::mapear);
+    }
     @Override public List<Comprobante> listar() throws SQLException {
         List<Comprobante> lista=new ArrayList<>();
         try(Connection c=ConexionBD.getInstancia().getConexion(); PreparedStatement p=c.prepareStatement(CONSULTA+" ORDER BY d.id_comprobante DESC"); ResultSet r=p.executeQuery()) { while(r.next()) lista.add(mapear(r)); }

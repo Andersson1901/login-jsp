@@ -31,7 +31,7 @@ elif (destino / "conexion.properties").exists():
 print("Compilación Java 17 correcta:", len(fuentes), "archivos.")
 if "--bd" in sys.argv:
     classpath = str(destino) + os.pathsep + classpath
-    pruebas = [str(raiz / "test/PruebasSeguridad.java"), str(raiz / "test/PruebasVentas.java"), str(raiz / "test/PruebasObservador.java")]
+    pruebas = [str(raiz / "test/PruebasSeguridad.java"), str(raiz / "test/PruebasVentas.java"), str(raiz / "test/PruebasObservador.java"), str(raiz / "test/PruebasReporte.java"), str(raiz / "test/PruebasPaginacion.java")]
     subprocess.run([javac, "--release", "17", "-encoding", "UTF-8", "-cp", classpath, "-d", str(destino)] + pruebas, check=True)
-    for prueba in ("PruebasSeguridad", "PruebasVentas", "PruebasObservador"):
+    for prueba in ("PruebasSeguridad", "PruebasVentas", "PruebasObservador", "PruebasReporte", "PruebasPaginacion"):
         subprocess.run([java, "-cp", classpath, prueba], check=True)

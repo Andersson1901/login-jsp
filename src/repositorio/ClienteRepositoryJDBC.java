@@ -1,6 +1,8 @@
 // Autor: Rodriguez Alvarado Andersson Eduardo
 package repositorio;
 import conexion.ConexionBD;
+import modelo.Consulta;
+import modelo.Pagina;
 import modelo.Cliente;
 import java.sql.*;
 import java.util.*;
@@ -17,6 +19,10 @@ public class ClienteRepositoryJDBC implements ClienteRepository {
         entidad.setCorreo(r.getString("correo"));
         entidad.setEstado(r.getString("estado"));
         return entidad;
+    }
+    private static final Map<String,String> COLUMNAS=Paginador.columnas("numero","nro_documento","nombres","nombres_razon_social","telefono","telefono","correo","correo","estado","estado");
+    @Override public Pagina<Cliente> buscar(Consulta consulta) throws SQLException {
+        return new Paginador("SELECT * FROM clientes",COLUMNAS,"id_cliente","id_cliente").general("nro_documento","nombres_razon_social").buscar(consulta,this::mapear);
     }
     @Override public List<Cliente> listar() throws SQLException { return listar(""); }
     @Override public List<Cliente> listar(String busqueda) throws SQLException {

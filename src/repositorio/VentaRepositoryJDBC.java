@@ -18,6 +18,10 @@ public class VentaRepositoryJDBC implements VentaRepository {
         v.setFecha(r.getTimestamp("fecha")); v.setSubtotal(r.getBigDecimal("subtotal")); v.setIgv(r.getBigDecimal("igv")); v.setTotal(r.getBigDecimal("total"));
         v.setEstado(r.getString("estado")); v.setIdUsuario(r.getInt("id_usuario")); return v;
     }
+    private static final Map<String,String> COLUMNAS=Paginador.columnas("venta","v.nro_venta","cliente","c.nombres_razon_social","subtotal","v.subtotal","igv","v.igv","total","v.total","estado","v.estado");
+    @Override public Pagina<Venta> buscar(Consulta consulta) throws SQLException {
+        return new Paginador(CONSULTA,COLUMNAS,"v.id_venta DESC","v.id_venta").buscar(consulta,this::mapear);
+    }
     @Override public List<Venta> listar() throws SQLException {
         List<Venta> lista=new ArrayList<>();
         try(Connection c=ConexionBD.getInstancia().getConexion(); PreparedStatement p=c.prepareStatement(CONSULTA+" ORDER BY v.id_venta DESC"); ResultSet r=p.executeQuery()) { while(r.next()) lista.add(mapear(r)); }

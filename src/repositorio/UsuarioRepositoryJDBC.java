@@ -2,6 +2,8 @@
 package repositorio;
 
 import conexion.ConexionBD;
+import modelo.Consulta;
+import modelo.Pagina;
 import modelo.Usuario;
 import modelo.ResultadoAcceso;
 import util.Seguridad;
@@ -9,6 +11,10 @@ import java.sql.*;
 import java.util.*;
 
 public class UsuarioRepositoryJDBC implements UsuarioRepository {
+    private static final Map<String,String> COLUMNAS=Paginador.columnas("usuario","usuario","nombre","CONCAT(nombres,' ',apellidos)","dni","dni","correo","correo","rol","rol","estado","estado");
+    @Override public Pagina<Usuario> buscar(Consulta consulta) throws SQLException {
+        return new Paginador("SELECT * FROM usuarios",COLUMNAS,"id_usuario","id_usuario").general("usuario","nombres","apellidos","dni").buscar(consulta,this::mapear);
+    }
     @Override public List<Usuario> listar() throws SQLException { return listar(""); }
 
     @Override public Usuario buscarPorUsuario(String usuario) throws SQLException {

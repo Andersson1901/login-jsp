@@ -1,6 +1,8 @@
 // Autor: Rodriguez Alvarado Andersson Eduardo
 package repositorio;
 import conexion.ConexionBD;
+import modelo.Consulta;
+import modelo.Pagina;
 import modelo.Producto;
 import java.sql.*;
 import java.util.*;
@@ -21,6 +23,15 @@ public class ProductoRepositoryJDBC implements ProductoRepository {
         entidad.setStockMinimo(r.getBigDecimal("stock_minimo"));
         entidad.setEstado(r.getString("estado"));
         return entidad;
+    }
+    private static final Map<String,String> COLUMNAS=Paginador.columnas("codigo","codigo","nombre","nombre","tipo","tipo","categoria","categoria","precio","precio_venta","stock","stock","estado","estado");
+    private static final Map<String,String> COLUMNAS_CATALOGO=Paginador.columnas("codigo","codigo","nombre","nombre","categoria","categoria");
+    @Override public Pagina<Producto> buscar(Consulta consulta) throws SQLException {
+        return new Paginador("SELECT * FROM productos",COLUMNAS,"id_producto","id_producto").general("codigo","nombre","categoria").buscar(consulta,this::mapear);
+    }
+    // Catálogo público: solo productos activos y solo las columnas que ya muestra.
+    @Override public Pagina<Producto> buscarActivos(Consulta consulta) throws SQLException {
+        return new Paginador("SELECT * FROM productos",COLUMNAS_CATALOGO,"nombre","id_producto").general("nombre","categoria","codigo").fijo("estado='ACTIVO'").buscar(consulta,this::mapear);
     }
     @Override public List<Producto> listar() throws SQLException { return listar(""); }
     @Override public List<Producto> listar(String busqueda) throws SQLException {

@@ -1,8 +1,10 @@
 // Autor: Rodriguez Alvarado Andersson Eduardo
 package controlador;
+import modelo.Consulta;
 import modelo.Cliente;
 import repositorio.ClienteRepository;
 import repositorio.Repositorios;
+import util.Paginacion;
 import util.Web;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -23,8 +25,8 @@ public class ClienteServlet extends HttpServlet {
                 request.setAttribute("registro",entidad);
                 request.getRequestDispatcher("/WEB-INF/vistas/clientes_formulario.jsp").forward(request,response);
             } else {
-                String q=Web.texto(request,"q",100); request.setAttribute("q",q);
-                request.setAttribute("registros",repositorio.listar(q));
+                Consulta consulta=Paginacion.consulta(request,""); request.setAttribute("q",consulta.getBusqueda());
+                Paginacion.listar(request,consulta,repositorio::buscar);
                 request.getRequestDispatcher("/WEB-INF/vistas/clientes.jsp").forward(request,response);
             }
         } catch(SQLException e) {

@@ -58,7 +58,7 @@ python3 herramientas/verificar.py
 python3 herramientas/verificar.py --bd
 ```
 
-La primera orden compila con Java 17 usando las librerías del Tomcat configurado en NetBeans. `--bd` ejecuta PruebasSeguridad, PruebasVentas y PruebasObservador (esta última requiere el script 06): PBKDF2, Singleton, CRUD, IGV, RUC, unicidad, rollback y dos peticiones simultáneas que disputan stock. Las pruebas de ventas crean y eliminan sus registros de prueba; pueden dejar saltos en correlativos e IDs, que no se reutilizan. No ejecutarlas en una base de producción.
+La primera orden compila con Java 17 usando las librerías del Tomcat configurado en NetBeans. `--bd` ejecuta PruebasSeguridad, PruebasVentas, PruebasObservador (requiere el script 06) y PruebasReporte: PBKDF2, Singleton, CRUD, IGV, RUC, unicidad, rollback y dos peticiones simultáneas que disputan stock. Las pruebas de ventas crean y eliminan sus registros de prueba; pueden dejar saltos en correlativos e IDs, que no se reutilizan. No ejecutarlas en una base de producción.
 
 También se probaron por HTTP las 25 vistas JSP, roles, CSRF, escape HTML, bloqueo y los cuatro CRUD más el proceso de ventas. Se verificaron visualmente las tildes, la cabecera compartida y agregar/quitar ítems en navegador. Los JSP tienen pageEncoding UTF-8 y cada página HTML tiene meta charset UTF-8 a través de su head; los includes de cuerpo no duplican la etiqueta meta.
 
@@ -103,3 +103,40 @@ Aplica `sql/06_observer_ventas.sql` una sola vez, reconstruye y vuelve a despleg
 Prueba automatizada: `python3 herramientas/verificar.py --bd` ejecuta también PruebasObservador. La primera parte no usa la base; la segunda crea tres usuarios, un cliente y un producto de prueba, comprueba los avisos y los elimina al terminar. `java -cp <clases> PruebasObservador --sin-bd` ejecuta solo la primera parte.
 
 Límites: los avisos son síncronos y de mejor esfuerzo (si un observador falla solo queda un registro en el log), no se envían correos y no hay separación de avisos por tienda. Se listan los últimos 100.
+
+
+## Etapa 9: Reportería de ventas
+No requiere script SQL. Reconstruye y vuelve a desplegar. Con la base de desarrollo en marcha:
+
+- Entra como vendedor1 y pulsa «Reporte de ventas» en el inicio. Se muestran los últimos 30 días con sus pedidos y ventas; no aparece selector de vendedor. Cambiar `?vendedor=` en la dirección no muestra datos de otro vendedor.
+- Entra como admin o como un DUENO: aparece el selector. «Toda la tienda» suma a todos los vendedores; al elegir uno, las cifras coinciden con las de esa persona.
+- Emite una venta y anúlala: la anulada aparece en la nota inferior y no suma a los ingresos. La emitida aparece en las tablas de ventas por día, productos y clientes, y en los gráficos.
+- «Descargar Excel» entrega `reporte-ventas-<desde>_<hasta>.xlsx` con las hojas Resumen, Ventas por día, Productos, Clientes, Ventas y Pedidos; sus cifras coinciden con la pantalla.
+- Fechas inválidas, inicial posterior a la final o un rango de más de 366 días muestran un mensaje y no consultan la base. Un rango sin datos muestra ceros y «Sin datos en el rango».
+- Un usuario CLIENTE que abra `/reportes` recibe 403.
+
+Prueba automatizada: `python3 herramientas/verificar.py --bd` ejecuta también PruebasReporte. La primera parte no usa la base; la segunda crea dos vendedores, un cliente y un producto de prueba, comprueba las cifras de cada vendedor y de la tienda, y los elimina al terminar. `java -cp build/verificacion PruebasReporte --sin-bd` ejecuta solo la primera parte.
+
+Límites: no hay separación por tienda; los rankings muestran 10 filas y el detalle del Excel hasta 5000 por consulta; solo se informan los datos que el sistema ya registra.
+
+
+## Etapa 10: Paginación, orden por columna y búsqueda automática
+Ejecuta una sola vez `sql/07_paginacion.sql` (índices) y vuelve a desplegar. Para probar con muchos registros puedes cargar 10 000 productos de prueba (usa el motor SEQUENCE de MariaDB; no se ejecutó en este entorno) y borrarlos al terminar:
+
+```sql
+INSERT INTO productos(codigo,nombre,descripcion,tipo,categoria,unidad_medida,precio_compra,precio_venta,stock,stock_minimo,estado)
+SELECT CONCAT('PRB-',LPAD(seq,5,'0')),CONCAT('Producto de prueba ',seq),'prueba','MERCADERIA','PruebaPaginacion','UND',1,seq/10,5,0,'ACTIVO' FROM seq_1_to_10000;
+-- al terminar: DELETE FROM productos WHERE categoria='PruebaPaginacion';
+```
+
+- Productos: la tabla muestra 10 filas y el pie dice «Página 1 de 10 · filas 1 a 10 de 100 traídas (tope alcanzado…)». Con el selector «Filas traídas de la BD» en 500 hay 50 páginas; en 50, cinco.
+- Pulsa «Precio sin IGV»: ordena de forma descendente (▼) y la página vuelve a 1. Púlsalo otra vez: ascendente (▲). Pulsa «Nombre»: empieza en descendente. Cambiar de página conserva el orden, el límite y la búsqueda.
+- Escribe `Codigo: PRB-0010` y espera medio segundo sin pulsar nada: la tabla se actualiza sola y la dirección cambia. Mientras no cambies el texto, no se envían más pedidos (pestaña Red del navegador). Con el campo vacío no se envía nada; el botón Buscar con el campo vacío muestra el listado completo.
+- `PRECIO SIN IGV: 3`, `categoría: prueba` y `Codigo: prb-0010` funcionan igual (primera palabra, sin distinguir mayúsculas ni tildes). `Marca: x` muestra «Columna no reconocida. Usa: …» y no consulta. `Nombre: 50%` busca el texto «50%», no «todo».
+- Repite el orden, el tope y las páginas en clientes, proveedores, usuarios, SOLPED, ventas, comprobantes, guías y avisos. Los permisos no cambian: un CLIENTE solo ve el catálogo.
+- Catálogo público (sin iniciar sesión): páginas de 10, búsqueda automática y `Código`, `Nombre` y `Categoría` como columnas válidas; `Estado: x` muestra el aviso.
+- Reportes: aparecen «Detalle de ventas» y «Detalle de pedidos» con orden, tope y páginas propios; ordenar uno no cambia el otro ni el rango de fechas, y el Excel sigue igual.
+
+Prueba automatizada: `python3 herramientas/verificar.py --bd` ejecuta también PruebasPaginacion. La primera parte no usa la base; la segunda crea 120 productos de prueba, comprueba el tope, las páginas, el orden y los filtros, y los elimina al terminar. `java -cp build/verificacion PruebasPaginacion --sin-bd` ejecuta solo la primera parte.
+
+Límites: los formularios de pedido siguen cargando todos los clientes y productos en sus listas desplegables; los productos no se separan por negocio; los filtros `LIKE '%valor%'` no usan índices, y lo que acota su costo es el tope de filas traídas; el total que se muestra llega como máximo al tope elegido.

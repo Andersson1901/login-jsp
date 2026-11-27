@@ -3,7 +3,9 @@ package controlador;
 
 import repositorio.UsuarioRepository;
 import repositorio.Repositorios;
+import modelo.Consulta;
 import modelo.Usuario;
+import util.Paginacion;
 import util.Seguridad;
 import util.Web;
 import java.io.IOException;
@@ -26,8 +28,8 @@ public class UsuarioServlet extends HttpServlet {
                 request.setAttribute("registro",u);
                 request.getRequestDispatcher("/WEB-INF/vistas/"+("clave".equals(accion)?"usuario_clave.jsp":"usuario_formulario.jsp")).forward(request,response);
             } else {
-                String q=Web.texto(request,"q",100);
-                request.setAttribute("q",q); request.setAttribute("registros",usuarios.listar(q));
+                Consulta consulta=Paginacion.consulta(request,""); request.setAttribute("q",consulta.getBusqueda());
+                Paginacion.listar(request,consulta,usuarios::buscar);
                 request.getRequestDispatcher("/WEB-INF/vistas/usuarios.jsp").forward(request,response);
             }
         } catch (SQLException e) {

@@ -13,6 +13,10 @@ public class GuiaRepositoryJDBC implements GuiaRepository {
         g.setIdVenta(r.getInt("id_venta")); g.setNroVenta(r.getString("nro_venta")); g.setFechaTraslado(r.getDate("fecha_traslado"));
         g.setPuntoPartida(r.getString("punto_partida")); g.setPuntoLlegada(r.getString("punto_llegada")); g.setEstado(r.getString("estado")); return g;
     }
+    private static final Map<String,String> COLUMNAS=Paginador.columnas("serie","g.serie","venta","v.nro_venta","fecha","g.fecha_traslado","partida","g.punto_partida","llegada","g.punto_llegada","estado","g.estado");
+    @Override public Pagina<GuiaRemision> buscar(Consulta consulta) throws SQLException {
+        return new Paginador(CONSULTA,COLUMNAS,"g.id_guia DESC","g.id_guia").buscar(consulta,this::mapear);
+    }
     @Override public List<GuiaRemision> listar() throws SQLException {
         List<GuiaRemision> lista=new ArrayList<>();
         try(Connection c=ConexionBD.getInstancia().getConexion(); PreparedStatement p=c.prepareStatement(CONSULTA+" ORDER BY g.id_guia DESC"); ResultSet r=p.executeQuery()) { while(r.next()) lista.add(mapear(r)); }

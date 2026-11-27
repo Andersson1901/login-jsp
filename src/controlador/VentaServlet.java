@@ -3,6 +3,7 @@ package controlador;
 
 import modelo.*;
 import repositorio.*;
+import util.Paginacion;
 import util.Web;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -54,11 +55,12 @@ public class VentaServlet extends HttpServlet {
                 request.setAttribute("esGuia",esGuia); request.setAttribute("registro",registro);
                 request.setAttribute("ventas",ventas.listar()); ver(request,response,"documento_formulario.jsp");
             } else {
+                Consulta consulta=Paginacion.consulta(request,"");
                 switch(ruta) {
-                    case "/solped": request.setAttribute("registros",solicitudes.listar()); break;
-                    case "/ventas": request.setAttribute("registros",ventas.listar()); break;
-                    case "/comprobantes": request.setAttribute("registros",comprobantes.listar()); break;
-                    case "/guias": request.setAttribute("registros",guias.listar()); break;
+                    case "/solped": Paginacion.listar(request,consulta,solicitudes::buscar); break;
+                    case "/ventas": Paginacion.listar(request,consulta,ventas::buscar); break;
+                    case "/comprobantes": Paginacion.listar(request,consulta,comprobantes::buscar); break;
+                    case "/guias": Paginacion.listar(request,consulta,guias::buscar); break;
                     default: throw new IllegalArgumentException("Módulo no válido.");
                 }
                 ver(request,response,ruta.substring(1)+"_lista.jsp");

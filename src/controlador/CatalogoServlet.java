@@ -1,8 +1,9 @@
 // Autor: Rodriguez Alvarado Andersson Eduardo
 package controlador;
 
+import modelo.Consulta;
 import repositorio.*;
-import util.Web;
+import util.Paginacion;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.*;
@@ -15,9 +16,9 @@ public class CatalogoServlet extends HttpServlet {
     @Override protected void doGet(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException {
         request.setAttribute("catalogoCargado",true);
         try {
-            String q=Web.texto(request,"q",100);
-            request.setAttribute("q",q);
-            request.setAttribute("productos",productos.listarActivos(q));
+            Consulta consulta=Paginacion.consulta(request,"");
+            request.setAttribute("q",consulta.getBusqueda());
+            request.setAttribute("productos",Paginacion.listar(request,consulta,productos::buscarActivos).getFilas());
         } catch(IllegalArgumentException e) {
             response.setStatus(400); request.setAttribute("error",e.getMessage());
         } catch(SQLException e) {

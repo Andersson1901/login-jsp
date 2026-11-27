@@ -14,11 +14,13 @@ if (request.getAttribute("catalogoCargado") == null) {
 </section>
 <form class="d-flex flex-wrap gap-2 mb-4" method="get" action="${pageContext.request.contextPath}/catalogo">
 <label for="q" class="visually-hidden">Buscar productos</label>
-<input id="q" class="form-control buscador-publico" name="q" maxlength="100" placeholder="Busca por nombre, categoría o código" value="<c:out value='${q}'/>">
+<input id="q" class="form-control buscador-publico" name="q" maxlength="100" placeholder="Busca por nombre, categoría o código, o escribe Columna: valor" value="<c:out value='${q}'/>" data-buscar>
+<input type="hidden" name="orden" value="<c:out value='${param.orden}'/>"><input type="hidden" name="dir" value="<c:out value='${param.dir}'/>"><input type="hidden" name="limite" value="<c:out value='${param.limite}'/>">
 <button class="btn btn-marino">Buscar</button>
 <c:if test="${not empty q}"><a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/catalogo">Ver todos</a></c:if>
 </form>
 <c:if test="${not empty error}"><div class="alert alert-danger" role="alert"><c:out value="${error}"/></div></c:if>
+<div id="resultados"><t:limite base="catalogo"/>
 <div class="row g-4">
 <c:forEach var="p" items="${productos}"><div class="col-sm-6 col-lg-4">
 <article class="card h-100 border-0 shadow-sm producto-publico"><div class="card-body p-4 d-flex flex-column">
@@ -32,5 +34,7 @@ if (request.getAttribute("catalogoCargado") == null) {
 </div></article></div></c:forEach>
 </div>
 <c:if test="${empty productos and empty error}"><div class="card p-4 text-center">No hay productos activos que coincidan con tu búsqueda.</div></c:if>
+<t:paginador pagina="${pagina}" base="catalogo"/></div>
 <p class="text-muted mt-4">Catálogo de consulta. Las ventas se registran desde el panel de la tienda.</p>
+<script src="${pageContext.request.contextPath}/assets/app.js"></script>
 <%@include file="WEB-INF/vistas/publica_pie.jspf"%>

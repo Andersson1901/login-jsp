@@ -2,6 +2,8 @@
 package repositorio;
 
 import conexion.ConexionBD;
+import modelo.Consulta;
+import modelo.Pagina;
 import modelo.Solped;
 import java.sql.*;
 import java.util.*;
@@ -12,6 +14,10 @@ public class SolpedRepositoryJDBC implements SolpedRepository {
         Solped s=new Solped(); s.setIdSolped(r.getInt("id_solped")); s.setNroSolped(r.getString("nro_solped"));
         s.setIdCliente(r.getInt("id_cliente")); s.setCliente(r.getString("cliente")); s.setFecha(r.getTimestamp("fecha"));
         s.setEstado(r.getString("estado")); s.setObservacion(r.getString("observacion")); s.setIdUsuario(r.getInt("id_usuario")); return s;
+    }
+    private static final Map<String,String> COLUMNAS=Paginador.columnas("numero","s.nro_solped","cliente","c.nombres_razon_social","fecha","s.fecha","estado","s.estado");
+    @Override public Pagina<Solped> buscar(Consulta consulta) throws SQLException {
+        return new Paginador(CONSULTA,COLUMNAS,"s.id_solped DESC","s.id_solped").buscar(consulta,this::mapear);
     }
     @Override public List<Solped> listar() throws SQLException {
         List<Solped> lista=new ArrayList<>();

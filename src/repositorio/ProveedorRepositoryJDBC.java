@@ -1,6 +1,8 @@
 // Autor: Rodriguez Alvarado Andersson Eduardo
 package repositorio;
 import conexion.ConexionBD;
+import modelo.Consulta;
+import modelo.Pagina;
 import modelo.Proveedor;
 import java.sql.*;
 import java.util.*;
@@ -17,6 +19,10 @@ public class ProveedorRepositoryJDBC implements ProveedorRepository {
         entidad.setDireccion(r.getString("direccion"));
         entidad.setEstado(r.getString("estado"));
         return entidad;
+    }
+    private static final Map<String,String> COLUMNAS=Paginador.columnas("ruc","ruc","razon","razon_social","contacto","contacto","telefono","telefono","estado","estado");
+    @Override public Pagina<Proveedor> buscar(Consulta consulta) throws SQLException {
+        return new Paginador("SELECT * FROM proveedores",COLUMNAS,"id_proveedor","id_proveedor").general("ruc","razon_social").buscar(consulta,this::mapear);
     }
     @Override public List<Proveedor> listar() throws SQLException { return listar(""); }
     @Override public List<Proveedor> listar(String busqueda) throws SQLException {
